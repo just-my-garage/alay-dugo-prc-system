@@ -37,7 +37,9 @@ const Index = () => {
             <Button variant="ghost" asChild>
               <Link to="/requests">Requests</Link>
             </Button>
-            <Button variant="default">Sign In</Button>
+            <Button variant="default" asChild>
+              <Link to="/donor-login">Sign In</Link>
+            </Button>
           </div>
         </div>
       </nav>
@@ -72,7 +74,7 @@ const Index = () => {
                 <Link to="/dashboard">Access Dashboard</Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
-                <Link to="/donors">Register as Donor</Link>
+                <Link to="/donor-register">Register as Donor</Link>
               </Button>
             </div>
           </div>
@@ -196,8 +198,8 @@ const Index = () => {
             for those in need across the Philippines.
           </p>
           <div className="flex gap-4 justify-center">
-            <Button size="lg" variant="secondary">
-              Register as Donor
+            <Button size="lg" variant="secondary" asChild>
+              <Link to="/donor-register">Register as Donor</Link>
             </Button>
             <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               Learn More
