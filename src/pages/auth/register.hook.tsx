@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth.context";
 import { DonorFormData } from "./auth.entity";
+import { supabase } from "@/integrations/supabase/client";
 
 export const useRegister = () => {
   const navigate = useNavigate();
@@ -170,6 +171,26 @@ export const useRegister = () => {
       const result = await signUpNewUser(formData.email, formData.password); // Call context function
 
       if (result.success) {
+        const { error } = await supabase.from('donors').insert([
+          {
+            first_name: formData.first_name,
+            last_name: formData.last_name,
+            date_of_birth: formData.date_of_birth,
+            blood_type: formData.blood_type,
+            contact_number: formData.contact_number,
+            email: formData.email,
+            address: formData.address,
+            city: formData.city,
+            province: formData.province,
+            zip_code: formData.zip_code,
+          }
+        ]);
+
+        if (error) {
+          setError("Failed to save donor details. Please try again.");
+          setIsLoading(false);
+          return;
+        }
         setSuccess(true); 
       } else {
         setError(result.error.message); // Show error message on failure

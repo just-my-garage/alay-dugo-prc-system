@@ -76,13 +76,10 @@ const DonorRegister = () => {
                 <span className="font-semibold text-foreground">
                   {formData.first_name}
                 </span>
-                ! Your donor registration has been submitted successfully.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Redirecting you to login...
+                !<br/><br/> Kindly check your email to confirm account activation.
               </p>
               <Button onClick={() => navigate("/donor-login")} size="lg">
-                Go to Login
+                Go back to Login
               </Button>
             </CardContent>
           </Card>
