@@ -201,7 +201,7 @@ const Home = () => {
             <Button size="lg" variant="secondary" asChild>
               <Link to="/donor-register">Register as Donor</Link>
             </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            <Button size="lg" variant="secondary" className="text-primary">
               Learn More
             </Button>
           </div>
