@@ -9,6 +9,8 @@ export interface DonorFormData {
   city: string;
   province: string;
   zip_code: string;
+  password: string;
+  confirmPassword: string;
 }
 
 export const bloodTypes: Array<string> = [

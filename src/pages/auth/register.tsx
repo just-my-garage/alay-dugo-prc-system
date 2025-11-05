@@ -17,38 +17,84 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Droplets,
-  Heart,
-  CheckCircle2,
-  AlertCircle,
-  User,
-  Phone,
-  Mail,
-  MapPin,
-  Calendar,
-} from "lucide-react";
+import { Droplets, Heart, CheckCircle2, AlertCircle, User, Phone, Mail, MapPin, Calendar, Lock, EyeOff, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useRegister } from "@/pages/auth/register.hook";
+import { bloodTypes } from "./auth.entity";
 
 const DonorRegister = () => {
   const { 
-    formData, 
+    // STATES AND HANDLER
+    formData,
     handleInputChange,
+
+    // SHOW PASSWORD
+    show,
+    setShow,
+
+    // NAVIGATION HANDLERS
+    currentStep,
     handleNext,
     handleBack,
     handleSubmit,
-    currentStep,
+
+    // STATES
     isLoading,
+    success,
     error,
+
+    // METHODS
     navigate,
-    bloodTypes,
   } = useRegister();
+
+    // ALL CODE BELOW IS IGNORED IF THIS SUCCEEDS
+    if (success) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-2">
+              <Droplets className="h-8 w-8 text-primary" />
+              <span className="text-xl font-bold text-foreground">
+                AlayDugo
+              </span>
+            </Link>
+          </div>
+        </nav>
+
+        <div className="flex-1 flex items-center justify-center bg-secondary/30 py-12 px-4">
+          <Card className="w-full max-w-md shadow-lg text-center">
+            <CardContent className="pt-12 pb-8">
+              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">
+                <CheckCircle2 className="h-10 w-10 text-success" />
+              </div>
+              <h2 className="text-2xl font-bold text-foreground mb-4">
+                Registration Successful!
+              </h2>
+              <p className="text-muted-foreground mb-6">
+                Welcome to AlayDugo,{" "}
+                <span className="font-semibold text-foreground">
+                  {formData.first_name}
+                </span>
+                ! Your donor registration has been submitted successfully.
+              </p>
+              <p className="text-sm text-muted-foreground mb-6">
+                Redirecting you to login...
+              </p>
+              <Button onClick={() => navigate("/donor-login")} size="lg">
+                Go to Login
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   const renderStepIndicator = () => (
     <div className="flex items-center justify-center mb-8">
       <div className="flex items-center space-x-4">
-        {[1, 2, 3].map((step) => (
+        {[1, 2, 3, 4].map((step) => (
           <div key={step} className="flex items-center">
             <div
               className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors ${
@@ -63,7 +109,7 @@ const DonorRegister = () => {
                 <span className="text-sm font-semibold">{step}</span>
               )}
             </div>
-            {step < 3 && (
+            {step < 4 && (
               <div
                 className={`w-16 h-0.5 mx-2 ${
                   currentStep > step ? "bg-primary" : "bg-muted-foreground/30"
@@ -253,59 +299,69 @@ const DonorRegister = () => {
         />
         <p className="text-xs text-muted-foreground">4-digit postal code</p>
       </div>
-
-      <Alert className="bg-primary/5 border-primary/20">
-        <Heart className="h-4 w-4 text-primary" />
-        <AlertDescription className="text-sm">
-          By registering, you're joining thousands of heroes saving lives
-          through blood donation. Thank you for your commitment to help others!
-        </AlertDescription>
-      </Alert>
     </div>
   );
 
-  if (__filename) {
-    return (
-      <div className="min-h-screen flex flex-col">
-        <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <Droplets className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">
-                AlayDugo
-              </span>
-            </Link>
-          </div>
-        </nav>
-
-        <div className="flex-1 flex items-center justify-center bg-secondary/30 py-12 px-4">
-          <Card className="w-full max-w-md shadow-lg text-center">
-            <CardContent className="pt-12 pb-8">
-              <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">
-                <CheckCircle2 className="h-10 w-10 text-success" />
-              </div>
-              <h2 className="text-2xl font-bold text-foreground mb-4">
-                Registration Successful!
-              </h2>
-              <p className="text-muted-foreground mb-6">
-                Welcome to AlayDugo,{" "}
-                <span className="font-semibold text-foreground">
-                  {formData.first_name}
-                </span>
-                ! Your donor registration has been submitted successfully.
-              </p>
-              <p className="text-sm text-muted-foreground mb-6">
-                Redirecting you to login...
-              </p>
-              <Button onClick={() => navigate("/donor-login")} size="lg">
-                Go to Login
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
+  const renderStep4 = () => (
+  <div className="space-y-4">
+    <div className="space-y-2">
+      <Label htmlFor="password">
+        Password <span className="text-destructive">*</span>
+      </Label>
+      <div className="relative">
+        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input
+          id="password"
+          type={show.password ? "text" : "password"}
+          placeholder="Enter a secure password"
+          value={formData.password}
+          onChange={(e) => handleInputChange("password", e.target.value)}
+          className="pl-10 pr-10"
+          required
+          minLength={8}
+        />
+        <button
+          type="button"
+          onClick={() => setShow({ ...show, password: !show.password })}
+          className="absolute right-2 top-2 p-1 text-muted-foreground"
+          aria-label={show.password ? "Hide password" : "Show password"}
+        >
+          {show.password ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+        </button>
       </div>
-    );
-  }
+      <p className="text-xs text-muted-foreground">Minimum 8 characters</p>
+    </div>
+
+    <div className="space-y-2">
+      <Label htmlFor="password_confirmation">
+        Confirm Password <span className="text-destructive">*</span>
+      </Label>
+      <div className="relative">
+        <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+        <Input
+          id="password_confirmation"
+          type={show.confirmPassword ? "text" : "password"}
+          placeholder="Re-enter your password"
+          value={formData.confirmPassword}
+          onChange={(e) =>
+            handleInputChange("confirmPassword", e.target.value)
+          }
+          className="pl-10 pr-10"
+          required
+          minLength={8}
+        />
+      </div>
+    </div>
+
+    <Alert className="bg-primary/5 border-primary/20">
+      <Heart className="h-4 w-4 text-primary" />
+      <AlertDescription className="text-sm">
+        By registering, you're joining thousands of heroes saving lives
+        through blood donation. Thank you for your commitment to help others!
+      </AlertDescription>
+    </Alert>
+  </div>
+);
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -349,11 +405,13 @@ const DonorRegister = () => {
                 {currentStep === 1 && "Personal Information"}
                 {currentStep === 2 && "Contact Information"}
                 {currentStep === 3 && "Address Details"}
+                {currentStep === 4 && "Set Your Password"}
               </CardTitle>
               <CardDescription>
                 {currentStep === 1 && "Let's start with your basic information"}
                 {currentStep === 2 && "How can we reach you?"}
-                {currentStep === 3 && "Where are you located? (Optional)"}
+                {currentStep === 3 && "Where are you located?"}
+                {currentStep === 4 && "Create a secure password for your account"}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -365,11 +423,12 @@ const DonorRegister = () => {
                     <AlertCircle className="h-4 w-4" />
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
-                )}
+                )} 
 
                 {currentStep === 1 && renderStep1()}
                 {currentStep === 2 && renderStep2()}
                 {currentStep === 3 && renderStep3()}
+                {currentStep === 4 && renderStep4()}
 
                 <div className="flex gap-4 pt-4">
                   {currentStep > 1 && (
@@ -383,7 +442,7 @@ const DonorRegister = () => {
                     </Button>
                   )}
 
-                  {currentStep < 3 ? (
+                  {currentStep < 4 ? (
                     <Button
                       type="button"
                       onClick={handleNext}

@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth.context";
-import { type DonorFormData, bloodTypes } from "./auth.entity";
+import { DonorFormData } from "./auth.entity";
 
 export const useRegister = () => {
   const navigate = useNavigate();
@@ -22,19 +22,21 @@ export const useRegister = () => {
     city: "",
     province: "",
     zip_code: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [showPassword, setShowPassword] = React.useState<{ [key: string]: boolean }>({
+  const [show, setShow] = React.useState<{ [key: string]: boolean}>({
     password: false,
     confirmPassword: false,
   });
 
   const [currentStep, setCurrentStep] = React.useState<number>(1);
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [success, setSuccess] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string>("");
 
   const handleInputChange = (field: keyof DonorFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    setError("");
   };
 
   const validateStep1 = () => {
@@ -95,7 +97,6 @@ export const useRegister = () => {
   };
 
   const validateStep3 = () => {
-    // Address fields are optional, but if provided, validate format
     if (formData.zip_code && formData.zip_code.trim()) {
       const zipRegex = /^[0-9]{4}$/;
       if (!zipRegex.test(formData.zip_code)) {
@@ -106,6 +107,35 @@ export const useRegister = () => {
     return true;
   };
 
+  const validateStep4 = () => {
+    if (!formData.password) {
+      setError("Password is required");
+      return false;
+    }
+    if (formData.password.length < 8) {
+      setError("Password must be at least 8 characters long");
+      return false;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return false;
+    }
+
+    if (!/[A-Z]/.test(formData.password)) {
+      setError("Password must contain at least one uppercase letter");
+      return false;
+    }
+    if (!/\d/.test(formData.password)) {
+      setError("Password must contain at least one number");
+      return false;
+    }
+    if (!/[^A-Za-z0-9]/.test(formData.password)) {
+      setError("Password must contain at least one special character");
+      return false;
+    }
+    return true;
+  }
+
   const handleNext = () => {
     console.log(currentStep)
     setError("");
@@ -113,8 +143,9 @@ export const useRegister = () => {
     if (currentStep === 1 && !validateStep1()) return;
     if (currentStep === 2 && !validateStep2()) return;
     if (currentStep === 3 && !validateStep3()) return;
+    if (currentStep === 4 && !validateStep4()) return;
 
-    if (currentStep < 3) {
+    if (currentStep < 4) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -129,8 +160,6 @@ export const useRegister = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    // INVESTIGATE ISSUE WITH VALIDATION STEP 3
     if (!validateStep3()) return;
 
     setError("");
@@ -138,12 +167,10 @@ export const useRegister = () => {
 
     // Simulate API call
     try {
-      const result = await signUpNewUser(formData.email, showPassword.password); // Call context function
+      const result = await signUpNewUser(formData.email, formData.password); // Call context function
 
       if (result.success) {
-        navigate("/auth/confirm-account", {
-          state: { email: formData.email },
-        });
+        setSuccess(true); 
       } else {
         setError(result.error.message); // Show error message on failure
       }
@@ -155,21 +182,28 @@ export const useRegister = () => {
   };
 
   return {
+    // BEST PRACTICE: Always include methods used to return statements
+    // ALL THE STATES AND HANDLERS
     formData,
     setFormData,
-    showPassword,
-    setShowPassword,
     handleInputChange,
-    validateStep1,
-    validateStep2,
-    validateStep3,
+
+    // SHOW PASSWORD
+    show,
+    setShow,
+
+    // NAVIGATION HANDLERS
+    currentStep,
     handleNext,
     handleBack,
     handleSubmit,
-    currentStep,
+
+    // STATES
     isLoading,
+    success,
     error,
+
+    // METHODS
     navigate,
-    bloodTypes,
   };
 };
