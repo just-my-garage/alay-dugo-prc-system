@@ -29,7 +29,7 @@ import {
   Calendar,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useRegister } from "@/pages/auth/use-register";
+import { useRegister } from "@/pages/auth/register.hook";
 
 const DonorRegister = () => {
   const { 

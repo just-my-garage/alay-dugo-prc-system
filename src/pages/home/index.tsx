@@ -11,10 +11,10 @@ import {
   Clock,
   MapPin
 } from "lucide-react";
-import heroImage from "@/assets/hero-blood-donation.jpg";
+import heroImage from "./assets/hero-blood-donation.jpg";
 import { Link } from "react-router-dom";
 
-const Index = () => {
+const Home = () => {
   return (
     <div className="min-h-screen">
       {/* Navigation */}
@@ -260,4 +260,4 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Home;

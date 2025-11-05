@@ -4,10 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./pages/auth/auth.context";
-import Index from "./pages/Index";
+import Home from "./pages/home";
 import Dashboard from "./pages/Dashboard";
 import Donors from "./pages/Donors";
-import DonorLogin from "./pages/DonorLogin";
+import DonorLogin from "./pages/auth/login";
 import DonorRegister from "./pages/auth/register";
 import Inventory from "./pages/Inventory";
 import Requests from "./pages/Requests";
@@ -23,7 +23,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Index />} />
+          <Route path="/" element={<Home />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/donors" element={<Donors />} />
           <Route path="/donor-login" element={<DonorLogin />} />
