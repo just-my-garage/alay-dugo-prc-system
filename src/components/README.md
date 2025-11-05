@@ -1,0 +1,1 @@
+the `ui/` folder mostly consist of shadcn components
