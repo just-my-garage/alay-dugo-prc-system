@@ -225,7 +225,7 @@ const Requests = () => {
           </div>
           <Button variant="default" size="lg">
             <AlertCircle className="mr-2 h-5 w-5" />
-            New Request
+            <Link to="/requests/create-request">New Requests</Link>
           </Button>
         </div>
 
