@@ -223,9 +223,11 @@ const Requests = () => {
             <h1 className="text-4xl font-bold mb-2 text-foreground">Blood Requests</h1>
             <p className="text-muted-foreground">Manage and fulfill hospital blood requests</p>
           </div>
-          <Button variant="default" size="lg">
-            <AlertCircle className="mr-2 h-5 w-5" />
-            New Request
+          <Button variant="default" size="lg" asChild>
+            <Link to="/create-request">
+              <AlertCircle className="mr-2 h-5 w-5" />
+              New Request
+            </Link>
           </Button>
         </div>
 
