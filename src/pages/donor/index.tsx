@@ -9,7 +9,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   Droplets,
   UserPlus,
@@ -21,14 +20,12 @@ import {
   Trash2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useRegister } from "../auth/register.hook";
 import useDonorPage from "./donor.hook";
+import NewDonorComponent from "./components/new-donor";
 
 const Donors = () => {
   const { fetch, isLoading, setIsLoading, handleDelete } = useDonorPage();
-  const { formData, setFormData, handleSubmit } = useRegister();
   const [showRegistration, setShowRegistration] = useState(false);
-
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -84,104 +81,7 @@ const Donors = () => {
 
         {/* Registration Form */}
         {showRegistration && (
-          <Card className="mb-8 border-primary/20">
-            <CardHeader>
-              <CardTitle>New Donor Registration</CardTitle>
-              <CardDescription>
-                Complete the form below to register a new blood donor
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form className="space-y-6">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="firstName">First Name</Label>
-                    <Input id="firstName" placeholder="Juan" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="lastName">Last Name</Label>
-                    <Input id="lastName" placeholder="dela Cruz" />
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="dob">Date of Birth</Label>
-                    <Input id="dob" type="date" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="bloodType">Blood Type</Label>
-                    <select
-                      id="bloodType"
-                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                    >
-                      <option value="">Select blood type</option>
-                      <option value="O+">O+</option>
-                      <option value="O-">O-</option>
-                      <option value="A+">A+</option>
-                      <option value="A-">A-</option>
-                      <option value="B+">B+</option>
-                      <option value="B-">B-</option>
-                      <option value="AB+">AB+</option>
-                      <option value="AB-">AB-</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Contact Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+63 912 345 6789"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="juan@example.com"
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="address">Complete Address</Label>
-                  <Input id="address" placeholder="Street, Barangay" />
-                </div>
-
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="city">City</Label>
-                    <Input id="city" placeholder="Manila" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="province">Province</Label>
-                    <Input id="province" placeholder="Metro Manila" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="zipCode">ZIP Code</Label>
-                    <Input id="zipCode" placeholder="1000" />
-                  </div>
-                </div>
-
-                <div className="flex gap-4 pt-4">
-                  <Button type="submit" variant="default">
-                    Register Donor
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setShowRegistration(false)}
-                  >
-                    Cancel
-                  </Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+          <NewDonorComponent setShowRegistration={setShowRegistration} />
         )}
 
         {/* Search */}
