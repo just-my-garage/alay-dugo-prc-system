@@ -76,7 +76,7 @@ const DonorRegister = () => {
                 <span className="font-semibold text-foreground">
                   {formData.first_name}
                 </span>
-                !<br/><br/> Kindly check your email to confirm account activation.
+                !<br/><br/><b>Kindly <u>check your email</u> to confirm account activation.</b>
               </p>
               <Button onClick={() => navigate("/donor-login")} size="lg">
                 Go back to Login
@@ -89,26 +89,26 @@ const DonorRegister = () => {
   }
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-center mb-8">
-      <div className="flex items-center space-x-4">
+    <div className="flex items-center justify-center mb-6 md:mb-8">
+      <div className="flex items-center space-x-2 sm:space-x-4">
         {[1, 2, 3, 4].map((step) => (
           <div key={step} className="flex items-center">
             <div
-              className={`flex items-center justify-center w-10 h-10 rounded-full border-2 transition-colors ${
+              className={`flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 rounded-full border-2 transition-colors ${
                 currentStep >= step
                   ? "bg-primary border-primary text-primary-foreground"
                   : "border-muted-foreground text-muted-foreground"
               }`}
             >
               {currentStep > step ? (
-                <CheckCircle2 className="h-5 w-5" />
+                <CheckCircle2 className="h-4 w-4 sm:h-5 sm:w-5" />
               ) : (
-                <span className="text-sm font-semibold">{step}</span>
+                <span className="text-xs sm:text-sm font-semibold">{step}</span>
               )}
             </div>
             {step < 4 && (
               <div
-                className={`w-16 h-0.5 mx-2 ${
+                className={`w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 ${
                   currentStep > step ? "bg-primary" : "bg-muted-foreground/30"
                 }`}
               />
@@ -121,7 +121,7 @@ const DonorRegister = () => {
 
   const renderStep1 = () => (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="first_name">
             First Name <span className="text-destructive">*</span>
@@ -260,7 +260,7 @@ const DonorRegister = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div className="space-y-2">
           <Label htmlFor="city">City/Municipality (Optional)</Label>
           <Input
@@ -369,109 +369,119 @@ const DonorRegister = () => {
             <Droplets className="h-8 w-8 text-primary" />
             <span className="text-xl font-bold text-foreground">AlayDugo</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
+          <div className="flex items-center gap-2 md:gap-4">
+            <Button variant="ghost" asChild className="hidden sm:flex">
               <Link to="/">Home</Link>
             </Button>
-            <Button variant="outline" asChild>
-              <Link to="/donor-login">Already registered? Sign In</Link>
+            <Button variant="outline" asChild size="sm" className="md:size-default">
+              <Link to="/donor-login">
+                <span className="hidden sm:inline">Already registered? </span>Sign In
+              </Link>
             </Button>
           </div>
         </div>
       </nav>
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 items-center lg:px-48 bg-secondary/30 py-12">
-        {/* Hero Text */}
-        <div className="mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <Heart className="h-8 w-8 text-primary" />
-          </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Become a Lifesaving Hero
-          </h1>
-          <p className="text-muted-foreground">
-            Register as a blood donor and help save lives in the Philippines
-          </p>
-        </div>
-        <div className="w-full max-w-2xl">
-          {/* Registration Card */}
-          <Card className="shadow-lg">
-            <CardHeader>
-              <CardTitle>
-                {currentStep === 1 && "Personal Information"}
-                {currentStep === 2 && "Contact Information"}
-                {currentStep === 3 && "Address Details"}
-                {currentStep === 4 && "Set Your Password"}
-              </CardTitle>
-              <CardDescription>
-                {currentStep === 1 && "Let's start with your basic information"}
-                {currentStep === 2 && "How can we reach you?"}
-                {currentStep === 3 && "Where are you located?"}
-                {currentStep === 4 && "Create a secure password for your account"}
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {renderStepIndicator()}
+      <div className="flex-1 bg-secondary/30 py-8 md:py-12 px-4">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            {/* Hero Text */}
+            <div className="text-center lg:text-left">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
+                <Heart className="h-8 w-8 text-primary" />
+              </div>
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+                Become a Lifesaving Hero
+              </h1>
+              <p className="text-sm md:text-base text-muted-foreground">
+                Register as a blood donor and help save lives in the Philippines
+              </p>
+            </div>
+            <div className="w-full">
+              {/* Registration Card */}
+              <Card className="shadow-lg">
+                <CardHeader className="space-y-1 pb-4">
+                  <CardTitle className="text-xl md:text-2xl">
+                    {currentStep === 1 && "Personal Information"}
+                    {currentStep === 2 && "Contact Information"}
+                    {currentStep === 3 && "Address Details"}
+                    {currentStep === 4 && "Set Your Password"}
+                  </CardTitle>
+                  <CardDescription className="text-sm">
+                    {currentStep === 1 && "Let's start with your basic information"}
+                    {currentStep === 2 && "How can we reach you?"}
+                    {currentStep === 3 && "Where are you located?"}
+                    {currentStep === 4 && "Create a secure password for your account"}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {renderStepIndicator()}
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )} 
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    {error && (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription>{error}</AlertDescription>
+                      </Alert>
+                    )} 
 
-                {currentStep === 1 && renderStep1()}
-                {currentStep === 2 && renderStep2()}
-                {currentStep === 3 && renderStep3()}
-                {currentStep === 4 && renderStep4()}
+                    {currentStep === 1 && renderStep1()}
+                    {currentStep === 2 && renderStep2()}
+                    {currentStep === 3 && renderStep3()}
+                    {currentStep === 4 && renderStep4()}
 
-                <div className="flex gap-4 pt-4">
-                  {currentStep > 1 && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={handleBack}
-                      className="flex-1"
-                    >
-                      Back
-                    </Button>
-                  )}
+                    <div className="flex gap-3 md:gap-4 pt-4">
+                      {currentStep > 1 && (
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleBack}
+                          className="flex-1"
+                          size="default"
+                        >
+                          Back
+                        </Button>
+                      )}
 
-                  {currentStep < 4 ? (
-                    <Button
-                      type="button"
-                      onClick={handleNext}
-                      className="flex-1"
-                    >
-                      Next
-                    </Button>
-                  ) : (
-                    <Button
-                      type="submit"
-                      className="flex-1"
-                      disabled={isLoading}
-                    >
-                      {isLoading ? "Registering..." : "Complete Registration"}
-                    </Button>
-                  )}
-                </div>
-              </form>
-            </CardContent>
-          </Card>
+                      {currentStep < 4 ? (
+                        <Button
+                          type="button"
+                          onClick={handleNext}
+                          className="flex-1"
+                          size="default"
+                        >
+                          Next
+                        </Button>
+                      ) : (
+                        <Button
+                          type="submit"
+                          className="flex-1"
+                          disabled={isLoading}
+                          size="default"
+                        >
+                          <span className="hidden sm:inline">{isLoading ? "Registering..." : "Complete Registration"}</span>
+                          <span className="sm:hidden">{isLoading ? "Register..." : "Register"}</span>
+                        </Button>
+                      )}
+                    </div>
+                  </form>
+                </CardContent>
+              </Card>
 
-          {/* Additional Info */}
-          <div className="mt-6 text-center">
-            <p className="text-sm text-muted-foreground">
-              Already have an account?{" "}
-              <Link
-                to="/donor-login"
-                className="text-primary hover:underline font-semibold"
-              >
-                Sign in here
-              </Link>
-            </p>
+              {/* Additional Info */}
+              <div className="mt-6 text-center">
+                <p className="text-sm text-muted-foreground">
+                  Already have an account?{" "}
+                  <Link
+                    to="/donor-login"
+                    className="text-primary hover:underline font-semibold"
+                  >
+                    Sign in here
+                  </Link>
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
