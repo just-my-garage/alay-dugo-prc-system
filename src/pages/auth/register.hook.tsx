@@ -171,7 +171,7 @@ export const useRegister = () => {
       const result = await signUpNewUser(formData.email, formData.password); // Call context function
 
       if (result.success) {
-        const { error } = await supabase.from('donors').insert([
+        const { error } = await supabase.from('users').insert([
           {
             first_name: formData.first_name,
             last_name: formData.last_name,
@@ -187,6 +187,7 @@ export const useRegister = () => {
         ]);
 
         if (error) {
+          console.log(error)
           setError("Failed to save donor details. Please try again.");
           setIsLoading(false);
           return;

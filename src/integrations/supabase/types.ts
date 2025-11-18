@@ -270,7 +270,7 @@ export type Database = {
           },
         ]
       }
-      donors: {
+      users: {
         Row: {
           address: string | null
           blood_type: string
@@ -289,6 +289,8 @@ export type Database = {
           province: string | null
           updated_at: string | null
           zip_code: string | null
+          isAdmin: boolean
+          isHospitalStaff: boolean
         }
         Insert: {
           address?: string | null
