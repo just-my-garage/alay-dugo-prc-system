@@ -1,29 +1,38 @@
 import { useState } from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  Droplets, 
-  UserPlus, 
+import {
+  Droplets,
+  UserPlus,
   Search,
   Phone,
   Mail,
   MapPin,
-  Calendar
+  Calendar,
+  Trash2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useRegister } from "../auth/register.hook";
+import useDonorPage from "./donor.hook";
 
 const Donors = () => {
+  const { fetch, isLoading, setIsLoading, handleDelete } = useDonorPage();
+  const { formData, setFormData, handleSubmit } = useRegister();
   const [showRegistration, setShowRegistration] = useState(false);
 
-  const recentDonors = [
-    { id: 1, name: "Maria Santos", bloodType: "O+", lastDonation: "2024-12-15", status: "Eligible", phone: "+63 912 345 6789" },
-    { id: 2, name: "Juan dela Cruz", bloodType: "A+", lastDonation: "2024-11-20", status: "Eligible", phone: "+63 923 456 7890" },
-    { id: 3, name: "Sofia Reyes", bloodType: "B-", lastDonation: "2025-01-10", status: "Temporarily Deferred", phone: "+63 934 567 8901" },
-    { id: 4, name: "Carlos Garcia", bloodType: "AB+", lastDonation: "2024-10-05", status: "Eligible", phone: "+63 945 678 9012" },
-  ];
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -56,11 +65,15 @@ const Donors = () => {
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-4xl font-bold mb-2 text-foreground">Donor Management</h1>
-            <p className="text-muted-foreground">Register and manage blood donors</p>
+            <h1 className="text-4xl font-bold mb-2 text-foreground">
+              Donor Management
+            </h1>
+            <p className="text-muted-foreground">
+              Register and manage blood donors
+            </p>
           </div>
-          <Button 
-            variant="default" 
+          <Button
+            variant="default"
             size="lg"
             onClick={() => setShowRegistration(!showRegistration)}
           >
@@ -74,7 +87,9 @@ const Donors = () => {
           <Card className="mb-8 border-primary/20">
             <CardHeader>
               <CardTitle>New Donor Registration</CardTitle>
-              <CardDescription>Complete the form below to register a new blood donor</CardDescription>
+              <CardDescription>
+                Complete the form below to register a new blood donor
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <form className="space-y-6">
@@ -96,7 +111,7 @@ const Donors = () => {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="bloodType">Blood Type</Label>
-                    <select 
+                    <select
                       id="bloodType"
                       className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                     >
@@ -116,11 +131,19 @@ const Donors = () => {
                 <div className="grid md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <Label htmlFor="phone">Contact Number</Label>
-                    <Input id="phone" type="tel" placeholder="+63 912 345 6789" />
+                    <Input
+                      id="phone"
+                      type="tel"
+                      placeholder="+63 912 345 6789"
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="juan@example.com" />
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="juan@example.com"
+                    />
                   </div>
                 </div>
 
@@ -145,9 +168,11 @@ const Donors = () => {
                 </div>
 
                 <div className="flex gap-4 pt-4">
-                  <Button type="submit" variant="default">Register Donor</Button>
-                  <Button 
-                    type="button" 
+                  <Button type="submit" variant="default">
+                    Register Donor
+                  </Button>
+                  <Button
+                    type="button"
                     variant="outline"
                     onClick={() => setShowRegistration(false)}
                   >
@@ -165,8 +190,8 @@ const Donors = () => {
             <div className="flex gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input 
-                  placeholder="Search donors by name, phone, or blood type..." 
+                <Input
+                  placeholder="Search donors by name, phone, or blood type..."
                   className="pl-10"
                 />
               </div>
@@ -182,13 +207,15 @@ const Donors = () => {
         <Card>
           <CardHeader>
             <CardTitle>Registered Donors</CardTitle>
-            <CardDescription>Recent donor registrations and their eligibility status</CardDescription>
+            <CardDescription>
+              Recent donor registrations and their eligibility status
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentDonors.map((donor) => (
-                <div 
-                  key={donor.id} 
+              {fetch.data?.map((donor: any) => (
+                <div
+                  key={donor.donor_id}
                   className="p-5 border rounded-lg hover:bg-secondary/50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
@@ -197,26 +224,36 @@ const Donors = () => {
                         <Droplets className="h-6 w-6 text-primary" />
                       </div>
                       <div>
-                        <div className="font-semibold text-lg text-foreground">{donor.name}</div>
+                        <div className="font-semibold text-lg text-foreground">
+                          {donor.first_name} {donor.last_name}
+                        </div>
                         <div className="flex items-center gap-4 mt-1">
-                          <Badge variant="default">{donor.bloodType}</Badge>
-                          <Badge 
-                            variant={donor.status === "Eligible" ? "success" : "warning"}
-                          >
-                            {donor.status}
+                          <Badge variant="default">{donor.blood_type}</Badge>
+                          <Badge variant={"success"}>
+                            {/* {donor.status} */}success
                           </Badge>
                         </div>
                       </div>
                     </div>
-                    <div className="text-right space-y-2">
-                      <div className="text-sm text-muted-foreground flex items-center gap-2 justify-end">
-                        <Phone className="h-3 w-3" />
-                        {donor.phone}
+                    <div className="flex items-center gap-4">
+                      <div className="text-right space-y-2">
+                        <div className="text-sm text-muted-foreground flex items-center gap-2 justify-end">
+                          <Phone className="h-3 w-3" />
+                          {donor.contact_number}
+                        </div>
+                        <div className="text-sm text-muted-foreground flex items-center gap-2 justify-end">
+                          <Calendar className="h-3 w-3" />
+                          {/* Last donation: {donor.lastDonation} */}
+                        </div>
                       </div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-2 justify-end">
-                        <Calendar className="h-3 w-3" />
-                        Last donation: {donor.lastDonation}
-                      </div>
+                      <Button
+                        variant="destructive"
+                        size="icon"
+                        onClick={() => handleDelete(donor.donor_id)}
+                        disabled={isLoading}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   </div>
                 </div>

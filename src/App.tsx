@@ -6,7 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./pages/auth/auth.context";
 import Home from "./pages/home";
 import Dashboard from "./pages/Dashboard";
-import Donors from "./pages/Donors";
+import Donors from "./pages/donor";
 import DonorLogin from "./pages/auth/login";
 import DonorRegister from "./pages/auth/register";
 import Inventory from "./pages/Inventory";
