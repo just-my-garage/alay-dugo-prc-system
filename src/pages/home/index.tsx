@@ -84,12 +84,12 @@ const Home = () => {
             <Button variant="ghost" asChild>
               <Link to="/requests">Requests</Link>
             </Button>
-            {session && userProfile ? (
+            {session ? (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-10 w-10 rounded-full">
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src="" alt={userProfile.first_name} />
+                      <AvatarImage src="" alt={userProfile?.first_name || "User"} />
                       <AvatarFallback>{getInitials()}</AvatarFallback>
                     </Avatar>
                   </Button>
@@ -98,10 +98,10 @@ const Home = () => {
                   <DropdownMenuLabel className="font-normal">
                     <div className="flex flex-col space-y-1">
                       <p className="text-sm font-medium leading-none">
-                        {userProfile.first_name} {userProfile.last_name}
+                        {userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : "Loading..."}
                       </p>
                       <p className="text-xs leading-none text-muted-foreground">
-                        {userProfile.email}
+                        {userProfile?.email || session.user.email}
                       </p>
                     </div>
                   </DropdownMenuLabel>
