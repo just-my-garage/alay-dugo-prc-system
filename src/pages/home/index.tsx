@@ -9,12 +9,59 @@ import {
   Package, 
   TrendingUp,
   Clock,
-  MapPin
+  MapPin,
+  LogOut,
+  UserCircle,
+  Settings
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import heroImage from "./assets/hero-blood-donation.jpg";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/auth.context";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Home = () => {
+  const { session, signOut } = useAuth();
+  const navigate = useNavigate();
+  const [userProfile, setUserProfile] = useState<{ first_name: string; last_name: string; email: string } | null>(null);
+
+  useEffect(() => {
+    if (session) {
+      navigate("/dashboard");
+    }
+  }, [session, navigate]);
+
+  useEffect(() => {
+    if (session?.user.email) {
+      const fetchProfile = async () => {
+        const { data } = await supabase
+          .from("users")
+          .select("first_name, last_name, email")
+          .eq("email", session.user.email)
+          .single();
+        
+        if (data) {
+          setUserProfile(data);
+        }
+      };
+      fetchProfile();
+    }
+  }, [session]);
+
+  const getInitials = () => {
+    if (!userProfile) return "U";
+    return `${userProfile.first_name?.[0] || ""}${userProfile.last_name?.[0] || ""}`.toUpperCase();
+  };
+
   return (
     <div className="min-h-screen">
       {/* Navigation */}
@@ -37,9 +84,48 @@ const Home = () => {
             <Button variant="ghost" asChild>
               <Link to="/requests">Requests</Link>
             </Button>
-            <Button variant="default" asChild>
-              <Link to="/donor-login">Sign In</Link>
-            </Button>
+            {session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage src="" alt={userProfile?.first_name || "User"} />
+                      <AvatarFallback>{getInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {userProfile ? `${userProfile.first_name} ${userProfile.last_name}` : "Loading..."}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {userProfile?.email || session.user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Account
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Button variant="default" asChild>
+                <Link to="/donor-login">Sign In</Link>
+              </Button>
+            )}
           </div>
         </div>
       </nav>
