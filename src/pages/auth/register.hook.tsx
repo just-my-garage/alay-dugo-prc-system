@@ -187,6 +187,7 @@ export const useRegister = () => {
         ]);
 
         if (error) {
+          console.log(error)
           setError("Failed to save donor details. Please try again.");
           setIsLoading(false);
           return;
