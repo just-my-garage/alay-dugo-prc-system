@@ -12,6 +12,8 @@ import DonorRegister from "./pages/auth/register";
 import Inventory from "./pages/Inventory";
 import Requests from "./pages/Requests";
 import CreateRequest from "./pages/CreateRequest";
+import Profile from "./pages/Profile";
+import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/inventory" element={<Inventory />} />
           <Route path="/requests" element={<Requests />} />
           <Route path="/create-request" element={<CreateRequest />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/account" element={<Account />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
