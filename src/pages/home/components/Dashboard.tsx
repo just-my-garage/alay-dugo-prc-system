@@ -40,11 +40,11 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b bg-card/50 backdrop-blur-sm top-0 z-50">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Droplets className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">AlayDugo</span>
+            <span className="text-xl font-bold text-foreground">Dashboard</span>
           </div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" asChild>
@@ -67,8 +67,7 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Overview of blood bank operations across PRC network</p>
+          <p className="text-muted-foreground text-center">Overview of blood bank operations across PRC network</p>
         </div>
 
         {/* Key Metrics */}
