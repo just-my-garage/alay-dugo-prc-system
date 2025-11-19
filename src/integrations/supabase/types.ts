@@ -258,7 +258,7 @@ export type Database = {
             foreignKeyName: "donations_donor_id_fkey"
             columns: ["donor_id"]
             isOneToOne: false
-            referencedRelation: "donors"
+            referencedRelation: "users"
             referencedColumns: ["donor_id"]
           },
           {
@@ -269,66 +269,6 @@ export type Database = {
             referencedColumns: ["drive_id"]
           },
         ]
-      }
-      donors: {
-        Row: {
-          address: string | null
-          blood_type: string
-          city: string | null
-          contact_number: string
-          created_at: string | null
-          date_of_birth: string
-          donor_id: number
-          eligibility_status:
-            | Database["public"]["Enums"]["eligibility_status_enum"]
-            | null
-          email: string | null
-          first_name: string
-          last_donation_date: string | null
-          last_name: string
-          province: string | null
-          updated_at: string | null
-          zip_code: string | null
-        }
-        Insert: {
-          address?: string | null
-          blood_type: string
-          city?: string | null
-          contact_number: string
-          created_at?: string | null
-          date_of_birth: string
-          donor_id?: number
-          eligibility_status?:
-            | Database["public"]["Enums"]["eligibility_status_enum"]
-            | null
-          email?: string | null
-          first_name: string
-          last_donation_date?: string | null
-          last_name: string
-          province?: string | null
-          updated_at?: string | null
-          zip_code?: string | null
-        }
-        Update: {
-          address?: string | null
-          blood_type?: string
-          city?: string | null
-          contact_number?: string
-          created_at?: string | null
-          date_of_birth?: string
-          donor_id?: number
-          eligibility_status?:
-            | Database["public"]["Enums"]["eligibility_status_enum"]
-            | null
-          email?: string | null
-          first_name?: string
-          last_donation_date?: string | null
-          last_name?: string
-          province?: string | null
-          updated_at?: string | null
-          zip_code?: string | null
-        }
-        Relationships: []
       }
       hospitals: {
         Row: {
@@ -387,103 +327,71 @@ export type Database = {
         }
         Relationships: []
       }
-      shipment_items: {
+      users: {
         Row: {
-          shipment_id: number
-          shipment_item_id: number
-          unit_id: string
+          address: string | null
+          blood_type: string
+          city: string | null
+          contact_number: string
+          created_at: string | null
+          date_of_birth: string
+          donor_id: number
+          eligibility_status:
+            | Database["public"]["Enums"]["eligibility_status_enum"]
+            | null
+          email: string | null
+          first_name: string
+          is_admin: boolean
+          is_hospital_staff: boolean | null
+          last_donation_date: string | null
+          last_name: string
+          province: string | null
+          updated_at: string | null
+          zip_code: string | null
         }
         Insert: {
-          shipment_id: number
-          shipment_item_id?: number
-          unit_id: string
+          address?: string | null
+          blood_type: string
+          city?: string | null
+          contact_number: string
+          created_at?: string | null
+          date_of_birth: string
+          donor_id?: number
+          eligibility_status?:
+            | Database["public"]["Enums"]["eligibility_status_enum"]
+            | null
+          email?: string | null
+          first_name: string
+          is_admin?: boolean
+          is_hospital_staff?: boolean | null
+          last_donation_date?: string | null
+          last_name: string
+          province?: string | null
+          updated_at?: string | null
+          zip_code?: string | null
         }
         Update: {
-          shipment_id?: number
-          shipment_item_id?: number
-          unit_id?: string
+          address?: string | null
+          blood_type?: string
+          city?: string | null
+          contact_number?: string
+          created_at?: string | null
+          date_of_birth?: string
+          donor_id?: number
+          eligibility_status?:
+            | Database["public"]["Enums"]["eligibility_status_enum"]
+            | null
+          email?: string | null
+          first_name?: string
+          is_admin?: boolean
+          is_hospital_staff?: boolean | null
+          last_donation_date?: string | null
+          last_name?: string
+          province?: string | null
+          updated_at?: string | null
+          zip_code?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "shipment_items_shipment_id_fkey"
-            columns: ["shipment_id"]
-            isOneToOne: false
-            referencedRelation: "shipments"
-            referencedColumns: ["shipment_id"]
-          },
-          {
-            foreignKeyName: "shipment_items_unit_id_fkey"
-            columns: ["unit_id"]
-            isOneToOne: false
-            referencedRelation: "blood_units"
-            referencedColumns: ["unit_id"]
-          },
-        ]
-      }
-      shipments: {
-        Row: {
-          actual_arrival_datetime: string | null
-          destination_center_id: number | null
-          destination_hospital_id: number | null
-          dispatch_datetime: string | null
-          estimated_arrival_datetime: string | null
-          origin_center_id: number
-          request_id: number | null
-          shipment_id: number
-          status: Database["public"]["Enums"]["shipment_status_enum"]
-        }
-        Insert: {
-          actual_arrival_datetime?: string | null
-          destination_center_id?: number | null
-          destination_hospital_id?: number | null
-          dispatch_datetime?: string | null
-          estimated_arrival_datetime?: string | null
-          origin_center_id: number
-          request_id?: number | null
-          shipment_id?: number
-          status: Database["public"]["Enums"]["shipment_status_enum"]
-        }
-        Update: {
-          actual_arrival_datetime?: string | null
-          destination_center_id?: number | null
-          destination_hospital_id?: number | null
-          dispatch_datetime?: string | null
-          estimated_arrival_datetime?: string | null
-          origin_center_id?: number
-          request_id?: number | null
-          shipment_id?: number
-          status?: Database["public"]["Enums"]["shipment_status_enum"]
-        }
-        Relationships: [
-          {
-            foreignKeyName: "shipments_destination_center_id_fkey"
-            columns: ["destination_center_id"]
-            isOneToOne: false
-            referencedRelation: "prc_centers"
-            referencedColumns: ["center_id"]
-          },
-          {
-            foreignKeyName: "shipments_destination_hospital_id_fkey"
-            columns: ["destination_hospital_id"]
-            isOneToOne: false
-            referencedRelation: "hospitals"
-            referencedColumns: ["hospital_id"]
-          },
-          {
-            foreignKeyName: "shipments_origin_center_id_fkey"
-            columns: ["origin_center_id"]
-            isOneToOne: false
-            referencedRelation: "prc_centers"
-            referencedColumns: ["center_id"]
-          },
-          {
-            foreignKeyName: "shipments_request_id_fkey"
-            columns: ["request_id"]
-            isOneToOne: false
-            referencedRelation: "blood_requests"
-            referencedColumns: ["request_id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Views: {

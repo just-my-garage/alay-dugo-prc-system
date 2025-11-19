@@ -42,6 +42,58 @@ const Inventory = () => {
     return <Badge variant="success">Good</Badge>;
   };
 
+  const exportToCSV = () => {
+    const timestamp = new Date().toISOString().split('T')[0];
+    
+    // Summary data
+    const totalUnits = inventoryData.reduce((sum, item) => sum + item.total, 0);
+    const availableUnits = inventoryData.reduce((sum, item) => sum + item.available, 0);
+    const inTestingUnits = inventoryData.reduce((sum, item) => sum + item.inTesting, 0);
+    const expiringSoonUnits = inventoryData.reduce((sum, item) => sum + item.expiringSoon, 0);
+    
+    let csvContent = "AlayDugo Blood Inventory Report\n";
+    csvContent += `Generated: ${new Date().toLocaleString()}\n\n`;
+    
+    // Summary section
+    csvContent += "INVENTORY SUMMARY\n";
+    csvContent += `Total Units,${totalUnits}\n`;
+    csvContent += `Available Units,${availableUnits}\n`;
+    csvContent += `In Testing,${inTestingUnits}\n`;
+    csvContent += `Expiring Soon (7 days),${expiringSoonUnits}\n\n`;
+    
+    // Blood type inventory
+    csvContent += "INVENTORY BY BLOOD TYPE\n";
+    csvContent += "Blood Type,Total,Available,In Testing,Expiring Soon,Trend\n";
+    inventoryData.forEach(item => {
+      csvContent += `${item.bloodType},${item.total},${item.available},${item.inTesting},${item.expiringSoon},${item.trend}\n`;
+    });
+    
+    // Low stock alerts
+    csvContent += "\nLOW STOCK ALERTS\n";
+    csvContent += "Center,Blood Type,Units,Status\n";
+    centerInventory.forEach(item => {
+      csvContent += `${item.center},${item.bloodType},${item.units},${item.status}\n`;
+    });
+    
+    // Recent transfers
+    csvContent += "\nRECENT TRANSFERS\n";
+    csvContent += "From Center,To Center,Blood Type,Units,Date\n";
+    recentTransfers.forEach(item => {
+      csvContent += `${item.from},${item.to},${item.bloodType},${item.units},${item.date}\n`;
+    });
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `blood-inventory-report-${timestamp}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
@@ -77,7 +129,7 @@ const Inventory = () => {
             <p className="text-muted-foreground">Real-time blood unit tracking across PRC network</p>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline">
+            <Button variant="outline" onClick={exportToCSV}>
               <Package className="mr-2 h-4 w-4" />
               Export Report
             </Button>
