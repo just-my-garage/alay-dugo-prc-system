@@ -11,6 +11,7 @@ import {
   Calendar
 } from "lucide-react";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 const Inventory = () => {
   const inventoryData = [
@@ -281,6 +282,9 @@ const Inventory = () => {
           </Card>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

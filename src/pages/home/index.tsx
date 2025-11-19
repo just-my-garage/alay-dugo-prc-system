@@ -1,9 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
-import Header from "@/components/header";
-
 import heroImage from "./assets/hero-blood-donation.jpg";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+
 import { Link } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import useHome from "./home.hook";
@@ -76,6 +77,7 @@ const Home = () => {
       </section>
 
       {/* Footer */}
+      <Footer />
     </div>
   );
 };

@@ -6,12 +6,12 @@ import {
   AlertCircle,
   Clock,
   CheckCircle,
-  XCircle,
   Hospital,
   Package
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 const Requests = () => {
   const emergencyRequests = [
@@ -324,6 +324,9 @@ const Requests = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
