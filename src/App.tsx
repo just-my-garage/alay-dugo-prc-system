@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./pages/auth/auth.context";
 import Home from "./pages/home";
-import Dashboard from "./pages/Dashboard";
 import Donors from "./pages/Donors";
 import DonorLogin from "./pages/auth/login";
 import DonorRegister from "./pages/auth/register";
@@ -27,7 +26,6 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/donors" element={<Donors />} />
           <Route path="/donor-login" element={<DonorLogin />} />
           <Route path="/donor-register" element={<DonorRegister />} />

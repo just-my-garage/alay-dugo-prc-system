@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { bloodTypes } from "./auth/auth.entity";
 import { ArrowLeft, Loader2 } from "lucide-react";
+import Footer from "@/components/footer";
 
 interface ProfileData {
   first_name: string;
@@ -131,7 +132,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-background py-12 px-4">
-      <div className="container mx-auto max-w-3xl">
+      <div className="container mx-auto max-w-3xl mb-16">
         <Button
           variant="ghost"
           onClick={() => navigate(-1)}
@@ -284,6 +285,9 @@ const Profile = () => {
           </CardContent>
         </Card>
       </div>
+
+      {/* Footer */}
+      <Footer /> 
     </div>
   );
 };

@@ -10,7 +10,8 @@ import {
   MapPin,
   Calendar
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 const Inventory = () => {
   const inventoryData = [
@@ -97,29 +98,7 @@ const Inventory = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Droplets className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">AlayDugo</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/">Home</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/donors">Donors</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/requests">Requests</Link>
-            </Button>
-            <Button variant="default">Sign In</Button>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
@@ -303,6 +282,9 @@ const Inventory = () => {
           </Card>
         </div>
       </div>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
