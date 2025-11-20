@@ -1,5 +1,7 @@
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const LearnMore: React.FC = () => {
 	return (
@@ -17,18 +19,12 @@ const LearnMore: React.FC = () => {
 					</p>
 
 					<div className="mt-6 flex justify-center gap-3">
-						<a
-							href="/create-request"
-							className="inline-flex items-center px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
-						>
-							Post a Request
-						</a>
-						<a
-							href="/register"
-							className="inline-flex items-center px-4 py-2 border border-slate-200 rounded-md text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-300"
-						>
-							Register as Donor
-						</a>
+						<Button size="lg" variant="secondary">
+							<Link to="/create-request">Post a Request</Link>
+						</Button>
+						<Button size="lg" variant="default">
+							<Link to="/donor-register">Register</Link>
+						</Button>
 					</div>
 				</header>
 

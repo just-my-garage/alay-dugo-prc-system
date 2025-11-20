@@ -14,6 +14,7 @@ import CreateRequest from "./pages/CreateRequest";
 import Profile from "./pages/Profile";
 import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
+import LearnMore from "./pages/LearnMore";
 
 const queryClient = new QueryClient();
 
@@ -34,6 +35,7 @@ const App = () => (
           <Route path="/create-request" element={<CreateRequest />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/learn-more" element={<LearnMore/>}/>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -70,7 +70,7 @@ const Home = () => {
               <Link to="/donor-register">Register as Donor</Link>
             </Button>
             <Button size="lg" variant="secondary" className="text-primary">
-              Learn More
+              <Link to="/learn-more">Learn More</Link>
             </Button>
           </div>
         </div>
