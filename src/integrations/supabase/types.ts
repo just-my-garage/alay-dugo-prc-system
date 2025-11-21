@@ -16,16 +16,19 @@ export type Database = {
     Tables: {
       blood_product_types: {
         Row: {
+          description: string | null
           product_name: string
           product_type_id: number
           shelf_life_days: number
         }
         Insert: {
+          description?: string | null
           product_name: string
           product_type_id?: number
           shelf_life_days: number
         }
         Update: {
+          description?: string | null
           product_name?: string
           product_type_id?: number
           shelf_life_days?: number
