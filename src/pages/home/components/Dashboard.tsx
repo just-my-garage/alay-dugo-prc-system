@@ -40,36 +40,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Droplets className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">AlayDugo</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/">Home</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/donors">Donors</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/inventory">Inventory</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/requests">Requests</Link>
-            </Button>
-            <Button variant="default">Sign In</Button>
-          </div>
-        </div>
-      </nav>
+
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground">Overview of blood bank operations across PRC network</p>
+          <p className="text-muted-foreground text-center">Overview of blood bank operations across PRC network</p>
         </div>
+
 
         {/* Key Metrics */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
@@ -146,7 +124,40 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 mb-8">
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>Upcoming Donation Drives</CardTitle>
+                <CardDescription>Scheduled blood donation events across the network</CardDescription>
+              </div>
+              <Button variant="outline" size="sm">Schedule New Drive</Button>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-3 gap-4">
+              {upcomingDrives.map((drive) => (
+                <div key={drive.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded">
+                      <Calendar className="h-5 w-5 text-primary" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="font-semibold text-foreground mb-1">{drive.name}</div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                        <MapPin className="h-3 w-3" />
+                        {drive.location}
+                      </div>
+                      <Badge variant="outline">{drive.date}</Badge>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <div className="grid lg:grid-cols-2 gap-6 my-8">
           {/* Emergency Requests */}
           <Card>
             <CardHeader>
@@ -223,38 +234,7 @@ const Dashboard = () => {
         </div>
 
         {/* Upcoming Donation Drives */}
-        <Card>
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle>Upcoming Donation Drives</CardTitle>
-                <CardDescription>Scheduled blood donation events across the network</CardDescription>
-              </div>
-              <Button variant="outline" size="sm">Schedule New Drive</Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-3 gap-4">
-              {upcomingDrives.map((drive) => (
-                <div key={drive.id} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
-                  <div className="flex items-start gap-3">
-                    <div className="p-2 bg-primary/10 rounded">
-                      <Calendar className="h-5 w-5 text-primary" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="font-semibold text-foreground mb-1">{drive.name}</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-                        <MapPin className="h-3 w-3" />
-                        {drive.location}
-                      </div>
-                      <Badge variant="outline">{drive.date}</Badge>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        
       </div>
     </div>
   );

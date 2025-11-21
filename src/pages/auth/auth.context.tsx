@@ -81,7 +81,7 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
       console.error("Error signing out:", error);
       return { success: false, error };
     } else {
-      window.location.href = "/auth/login";
+      window.location.href = "/";
     }
   }
 
