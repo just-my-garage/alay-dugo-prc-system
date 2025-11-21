@@ -131,7 +131,9 @@ const Dashboard = () => {
                 <CardTitle>Upcoming Donation Drives</CardTitle>
                 <CardDescription>Scheduled blood donation events across the network</CardDescription>
               </div>
-              <Button variant="outline" size="sm">Schedule New Drive</Button>
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/schedule-drive">Schedule New Drive</Link>
+              </Button>
             </div>
           </CardHeader>
           <CardContent>

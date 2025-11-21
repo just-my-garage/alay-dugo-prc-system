@@ -13,6 +13,7 @@ import Requests from "./pages/Requests";
 import CreateRequest from "./pages/CreateRequest";
 import Profile from "./pages/Profile";
 import Account from "./pages/Account";
+import ScheduleDrive from "./pages/ScheduleDrive";
 import NotFound from "./pages/NotFound";
 import LearnMore from "./pages/LearnMore";
 
@@ -35,6 +36,7 @@ const App = () => (
           <Route path="/create-request" element={<CreateRequest />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/account" element={<Account />} />
+          <Route path="/schedule-drive" element={<ScheduleDrive />} />
           <Route path="/learn-more" element={<LearnMore/>}/>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
