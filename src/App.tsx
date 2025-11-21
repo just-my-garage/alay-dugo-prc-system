@@ -13,7 +13,7 @@ import Requests from "./pages/Requests";
 import CreateRequest from "./pages/CreateRequest";
 import Profile from "./pages/Profile";
 import Account from "./pages/Account";
-import ScheduleDrive from "./pages/ScheduleDrive";
+import ScheduleDrive from "./pages/home/components/ScheduleDrive";
 import NotFound from "./pages/NotFound";
 import LearnMore from "./pages/LearnMore";
 

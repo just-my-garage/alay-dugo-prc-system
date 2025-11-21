@@ -8,15 +8,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Droplets, LogOut, UserCircle, Settings } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import useHome from "@/pages/home/home.hook";
 
 const Header = () => {
   const navigate = useNavigate();
-  const { userProfile, authenticated, getInitials, session, signOut } =
+  const location = useLocation();
+  const { userProfile, getInitials, session, signOut } =
     useHome();
+
+  const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
@@ -26,16 +29,40 @@ const Header = () => {
           <span className="text-xl font-bold text-foreground">AlayDugo</span>
         </div>
         <div className="flex items-center gap-4">
-          <Button variant="ghost" asChild>
-            <Link to='/'>Home</Link>
+          <Button
+            variant="ghost"
+            asChild
+            className={`${
+              isActive("/") ? "bg-primary text-white hover:bg-none" : ""
+            }`}
+          >
+            <Link to="/">Home</Link>
           </Button>
-          <Button variant="ghost" asChild>
+          <Button
+            variant="ghost"
+            asChild
+            className={`${
+              isActive("/donors") ? "bg-primary text-white hover:bg-none" : ""
+            }`}
+          >
             <Link to="/donors">Donors</Link>
           </Button>
-          <Button variant="ghost" asChild>
+          <Button
+            variant="ghost"
+            asChild
+            className={`${
+              isActive("/inventory") ? "bg-primary text-white hover:bg-none" : ""
+            }`}
+          >
             <Link to="/inventory">Inventory</Link>
           </Button>
-          <Button variant="ghost" asChild>
+          <Button
+            variant="ghost"
+            asChild
+            className={`${
+              isActive("/requests") ? "bg-primary text-white hover:bg-none" : ""
+            }`}
+          >
             <Link to="/requests">Requests</Link>
           </Button>
           {session ? (
