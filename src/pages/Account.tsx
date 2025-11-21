@@ -5,7 +5,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -118,38 +124,44 @@ const Account = () => {
 
     setLoading(true);
     try {
-      // Verify password by attempting to sign in
-      const { error: signInError } = await supabase.auth.signInWithPassword({
+      // Step 1: Re-authenticate to verify password
+      const { error: authError } = await supabase.auth.signInWithPassword({
         email: session?.user.email || "",
         password: deletePassword,
       });
 
-      if (signInError) {
-        throw new Error("Invalid password");
+      if (authError) {
+        throw new Error("Invalid password. Please try again.");
       }
 
-      // Delete user data from users table
-      const { error: deleteError } = await supabase
-        .from("users")
-        .delete()
-        .eq("email", session?.user.email);
+      // Step 2: Call a Supabase Edge Function to handle deletion
+      // This is the secure way - deletion happens server-side
+      const { error: deleteError } = await supabase.functions.invoke(
+        "delete-user-account",
+        {
+          body: { userId: session?.user.id },
+        }
+      );
 
       if (deleteError) throw deleteError;
 
       toast({
         title: "Account Deleted",
-        description: "Your account data has been successfully deleted",
+        description: "Your account has been successfully deleted",
       });
 
+      // Step 3: Sign out after successful deletion
       await signOut();
+      navigate("/");
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to delete account",
         variant: "destructive",
       });
     } finally {
       setLoading(false);
+      setDeletePassword("");
     }
   };
 
@@ -161,11 +173,7 @@ const Account = () => {
   return (
     <div className="min-h-screen bg-background py-12 px-4">
       <div className="container mx-auto max-w-3xl">
-        <Button
-          variant="ghost"
-          onClick={() => navigate(-1)}
-          className="mb-6"
-        >
+        <Button variant="ghost" onClick={() => navigate(-1)} className="mb-6">
           <ArrowLeft className="h-4 w-4 mr-2" />
           Back
         </Button>
@@ -204,7 +212,8 @@ const Account = () => {
               {!codeSent ? (
                 <div className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Click the button below to receive a password reset link via email
+                    Click the button below to receive a password reset link via
+                    email
                   </p>
                   <Button onClick={handleSendResetCode} disabled={loading}>
                     {loading ? (
@@ -220,7 +229,8 @@ const Account = () => {
               ) : (
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <p className="text-sm text-muted-foreground">
-                    Check your email and click the reset link, then enter your new password below
+                    Check your email and click the reset link, then enter your
+                    new password below
                   </p>
                   <div className="space-y-2">
                     <Label htmlFor="new_password">New Password</Label>
@@ -233,7 +243,9 @@ const Account = () => {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="confirm_password">Confirm New Password</Label>
+                    <Label htmlFor="confirm_password">
+                      Confirm New Password
+                    </Label>
                     <Input
                       id="confirm_password"
                       type="password"
@@ -272,10 +284,12 @@ const Account = () => {
                 </AlertDialogTrigger>
                 <AlertDialogContent>
                   <AlertDialogHeader>
-                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                    <AlertDialogTitle>
+                      Are you absolutely sure?
+                    </AlertDialogTitle>
                     <AlertDialogDescription>
-                      This action cannot be undone. This will permanently delete your
-                      account and remove all your data from our servers.
+                      This action cannot be undone. This will permanently delete
+                      your account and remove all your data from our servers.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <div className="space-y-2 my-4">
