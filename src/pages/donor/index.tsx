@@ -14,21 +14,20 @@ import {
   UserPlus,
   Search,
   Phone,
-  Mail,
-  MapPin,
   Calendar,
   Trash2,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import useDonorPage from "./donor.hook";
 import NewDonorComponent from "./components/new-donor";
+import Loading from "@/components/loading";
 
 const Donors = () => {
   const { fetch, isLoading, setIsLoading, handleDelete } = useDonorPage();
   const [showRegistration, setShowRegistration] = useState(false);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loading />;
   }
 
   return (
