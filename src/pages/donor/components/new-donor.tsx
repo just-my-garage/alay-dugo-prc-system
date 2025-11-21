@@ -12,8 +12,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 const NewDonorComponent = ({ setShowRegistration }) => {
-  const { formData, handleInputChange, handleSubmit, isLoading, error } =
-    useRegister();
+  const {
+    formData,
+    handleInputChange,
+    handleSubmit,
+    isLoading,
+    error,
+    success,
+  } = useRegister();
 
   return (
     <Card className="mb-8 border-primary/20">
@@ -24,6 +30,12 @@ const NewDonorComponent = ({ setShowRegistration }) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {success && (
+          <div className="bg-success/10 text-success text-md p-4 rounded-md mb-4 ">
+            <b>User Successfully Registered!</b> <br/>
+            Kindly inform the donor to check their email for account activation instructions.
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div className="bg-destructive/10 text-destructive text-sm p-3 rounded-md">
@@ -172,9 +184,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
                 type="password"
                 placeholder="Add your password"
                 value={formData.password}
-                onChange={(e) =>
-                  handleInputChange("password", e.target.value)
-                }
+                onChange={(e) => handleInputChange("password", e.target.value)}
                 disabled={isLoading}
               />
             </div>
@@ -185,7 +195,9 @@ const NewDonorComponent = ({ setShowRegistration }) => {
                 type="password"
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
-                onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                onChange={(e) =>
+                  handleInputChange("confirmPassword", e.target.value)
+                }
                 disabled={isLoading}
               />
             </div>

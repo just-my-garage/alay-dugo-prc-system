@@ -16,48 +16,27 @@ import {
   Phone,
   Calendar,
   Trash2,
+  Mail,
+  MapPin,
+  Cake,
 } from "lucide-react";
-import { Link } from "react-router-dom";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
 import useDonorPage from "./donor.hook";
 import NewDonorComponent from "./components/new-donor";
 import Loading from "@/components/loading";
 
 const Donors = () => {
-  const { fetch, isLoading, setIsLoading, handleDelete } = useDonorPage();
+  const { fetch, isLoading, handleDelete, searchQuery, setSearchQuery } =
+    useDonorPage();
   const [showRegistration, setShowRegistration] = useState(false);
-
-  if (isLoading) {
-    return <Loading />;
-  }
 
   return (
     <div className="min-h-screen bg-background">
       {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Droplets className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">AlayDugo</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/">Home</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/dashboard">Dashboard</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/inventory">Inventory</Link>
-            </Button>
-            <Button variant="ghost" asChild>
-              <Link to="/requests">Requests</Link>
-            </Button>
-            <Button variant="default">Sign In</Button>
-          </div>
-        </div>
-      </nav>
+      <Header />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 mb-8">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between">
           <div>
@@ -92,12 +71,15 @@ const Donors = () => {
                 <Input
                   placeholder="Search donors by name, phone, or blood type..."
                   className="pl-10"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
               </div>
-              <Button variant="outline">
-                <Search className="mr-2 h-4 w-4" />
-                Search
-              </Button>
+              {searchQuery && (
+                <Button variant="outline" onClick={() => setSearchQuery("")}>
+                  Clear
+                </Button>
+              )}
             </div>
           </CardContent>
         </Card>
@@ -111,56 +93,115 @@ const Donors = () => {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {fetch.data?.map((donor: any) => (
-                <div
-                  key={donor.donor_id}
-                  className="p-5 border rounded-lg hover:bg-secondary/50 transition-colors"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <div className="p-3 bg-primary/10 rounded-lg">
-                        <Droplets className="h-6 w-6 text-primary" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-lg text-foreground">
-                          {donor.first_name} {donor.last_name}
+            {isLoading ? (
+              <Loading component={true} />
+            ) : (
+              <div className="space-y-4">
+                {fetch.data?.map((donor: any) => {
+                  const formatDate = (dateString: string) => {
+                    if (!dateString) return "N/A";
+                    return new Date(dateString).toLocaleDateString("en-US", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    });
+                  };
+
+                  const getEligibilityColor = (status: string) => {
+                    if (status === "Eligible") return "success";
+                    if (status === "Ineligible") return "destructive";
+                    return "secondary";
+                  };
+
+                  return (
+                    <div
+                      key={donor.donor_id}
+                      className="p-6 border rounded-xl hover:shadow-lg transition-all duration-200 bg-card"
+                    >
+                      <div className="flex items-start justify-between gap-6">
+                        {/* Left Section - Main Info */}
+                        <div className="flex items-start gap-4 flex-1">
+                          <div className="p-4 bg-primary/10 rounded-xl">
+                            <Droplets className="h-8 w-8 text-primary" />
+                          </div>
+                          <div className="space-y-3 flex-1">
+                            {/* Name and Blood Type */}
+                            <div>
+                              <div className="font-bold text-xl text-foreground mb-2">
+                                {donor.first_name} {donor.last_name}
+                              </div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Badge variant="default" className="text-sm font-semibold">
+                                  {donor.blood_type}
+                                </Badge>
+                                <Badge variant={getEligibilityColor(donor.eligibility_status)}>
+                                  {donor.eligibility_status || "Pending"}
+                                </Badge>
+                              </div>
+                            </div>
+
+                            {/* Contact Info Grid */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Mail className="h-4 w-4 flex-shrink-0" />
+                                <span className="truncate">{donor.email}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Phone className="h-4 w-4 flex-shrink-0" />
+                                <span>{donor.contact_number}</span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <MapPin className="h-4 w-4 flex-shrink-0" />
+                                <span className="truncate">
+                                  {donor.address}, {donor.city}, {donor.province}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-2 text-muted-foreground">
+                                <Cake className="h-4 w-4 flex-shrink-0" />
+                                <span>Born: {formatDate(donor.date_of_birth)}</span>
+                              </div>
+                            </div>
+
+                            {/* Donation History */}
+                            <div className="pt-2 border-t">
+                              <div className="flex items-center gap-2 text-sm">
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                                <span className="text-muted-foreground">
+                                  Last Donation:{" "}
+                                  <span className="font-medium text-foreground">
+                                    {donor.last_donation_date
+                                      ? formatDate(donor.last_donation_date)
+                                      : "No record"}
+                                  </span>
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-4 mt-1">
-                          <Badge variant="default">{donor.blood_type}</Badge>
-                          <Badge variant={"success"}>
-                            {/* {donor.status} */}success
-                          </Badge>
+
+                        {/* Right Section - Actions */}
+                        <div className="flex flex-col gap-2">
+                          <Button
+                            variant="destructive"
+                            size="icon"
+                            onClick={() => handleDelete(donor.donor_id)}
+                            disabled={isLoading}
+                            className="h-10 w-10"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <div className="text-right space-y-2">
-                        <div className="text-sm text-muted-foreground flex items-center gap-2 justify-end">
-                          <Phone className="h-3 w-3" />
-                          {donor.contact_number}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-2 justify-end">
-                          <Calendar className="h-3 w-3" />
-                          {/* Last donation: {donor.lastDonation} */}
-                        </div>
-                      </div>
-                      <Button
-                        variant="destructive"
-                        size="icon"
-                        onClick={() => handleDelete(donor.donor_id)}
-                        disabled={isLoading}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                  );
+                })}
+              </div>
+            )}
           </CardContent>
         </Card>
       </div>
+
+      <Footer />
     </div>
   );
 };
