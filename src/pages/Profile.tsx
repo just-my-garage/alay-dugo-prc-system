@@ -50,10 +50,11 @@ const Profile = () => {
 
     const fetchProfile = async () => {
       try {
+        const email = session?.user?.email?.toLowerCase();
         const { data, error } = await supabase
           .from("users")
           .select("*")
-          .eq("email", session.user.email)
+          .eq("email", email)
           .single();
 
         if (error) throw error;
@@ -90,6 +91,7 @@ const Profile = () => {
     setSaving(true);
 
     try {
+      const email = session?.user?.email?.toLowerCase();
       const { error } = await supabase
         .from("users")
         .update({
@@ -103,14 +105,20 @@ const Profile = () => {
           province: profileData.province,
           zip_code: profileData.zip_code,
         })
-        .eq("email", session?.user.email);
+        .eq("email", email);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Profile update error:", error);
+        toast({ title: "Error", description: error.message || String(error), variant: "destructive" });
+        return;
+      }
 
       toast({
         title: "Success",
         description: "Profile updated successfully",
       });
+      console.log(error);
+      console.log(profileData);
     } catch (error: any) {
       toast({
         title: "Error",

@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Droplets, Heart, Mail, Lock, AlertCircle } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "./auth.context";
 
 const DonorLogin = () => {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ const DonorLogin = () => {
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { signInUser } = useAuth();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,15 +24,14 @@ const DonorLogin = () => {
     setIsLoading(true);
 
     // Simulate login logic
-    setTimeout(() => {
-      if (email && password) {
-        // Success - navigate to dashboard or donor portal
-        navigate("/dashboard");
-      } else {
-        setError("Please enter both email and password");
-      }
-      setIsLoading(false);
-    }, 1000);
+    const res = await signInUser(email, password);
+    setIsLoading(false);
+
+    if (res.success) {
+      navigate("/dashboard");
+    } else {
+      setError(String(res.error || "Sign-in failed"));
+    }
   };
 
   return (
