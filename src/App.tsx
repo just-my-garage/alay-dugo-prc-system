@@ -9,8 +9,8 @@ import Donors from "./pages/donor";
 import DonorLogin from "./pages/auth/login";
 import DonorRegister from "./pages/auth/register";
 import Inventory from "./pages/Inventory";
-import Requests from "./pages/Requests";
-import CreateRequest from "./pages/CreateRequest";
+import Requests from "./pages/blood-requests";
+import CreateRequest from "./pages/blood-requests/components/CreateRequest";
 import Profile from "./pages/Profile";
 import Account from "./pages/Account";
 import ScheduleDrive from "./pages/home/components/ScheduleDrive";
@@ -23,7 +23,7 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthContextProvider>
     <TooltipProvider>
-      <Toaster />
+      <Toaster /> 
       <Sonner />
       <BrowserRouter>
         <Routes>
