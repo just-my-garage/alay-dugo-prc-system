@@ -12,8 +12,23 @@ import {
   Clock
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const Dashboard = () => {
+  // Fetch active donors count
+  const { data: activeDonorsCount = 0 } = useQuery({
+    queryKey: ["active-donors-count"],
+    queryFn: async () => {
+      const { count, error } = await supabase
+        .from("users")
+        .select("*", { count: "exact", head: true })
+        .eq("eligibility_status", "Eligible");
+      
+      if (error) throw error;
+      return count || 0;
+    },
+  });
   const emergencyRequests = [
     { id: 1, hospital: "Manila General Hospital", bloodType: "O-", units: 5, time: "15 mins ago" },
     { id: 2, hospital: "Cebu Medical Center", bloodType: "AB+", units: 3, time: "32 mins ago" },
@@ -56,10 +71,9 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Active Donors</div>
-                  <div className="text-3xl font-bold text-foreground">15,420</div>
-                  <div className="text-xs text-success flex items-center gap-1 mt-1">
-                    <TrendingUp className="h-3 w-3" />
-                    +12% from last month
+                  <div className="text-3xl font-bold text-foreground">{activeDonorsCount.toLocaleString()}</div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Eligible to donate
                   </div>
                 </div>
                 <div className="p-3 bg-primary/10 rounded-lg">
