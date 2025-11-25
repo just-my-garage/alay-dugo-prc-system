@@ -21,6 +21,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import Loading from "@/components/loading";
 import FulfillRequest from "./components/FulfillRequest";
+import ViewRequestDetails from "./components/ViewRequestDetails";
 import { useState } from "react";
 
 const Requests = () => {
@@ -31,14 +32,22 @@ const Requests = () => {
     urgentRequests,
     routineRequests,
     refetch,
+    deleteRequest,
   } = useBloodRequestsPage();
 
   const [fulfillDialogOpen, setFulfillDialogOpen] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
+  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const [viewDetailsRequest, setViewDetailsRequest] = useState<any>(null);
 
   const handleFulfillClick = (request: any) => {
     setSelectedRequest(request);
     setFulfillDialogOpen(true);
+  };
+
+  const handleViewDetailsClick = (request: any) => {
+    setViewDetailsRequest(request);
+    setViewDetailsOpen(true);
   };
 
   // Process data from API
@@ -194,7 +203,11 @@ const Requests = () => {
             </div>
           </div>
         )}
-        <Button variant="outline" size="sm">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => handleViewDetailsClick(request)}
+        >
           View Details
         </Button>
       </div>
@@ -220,7 +233,7 @@ const Requests = () => {
 
       <div className="container mx-auto px-4 py-8 lg:grid grid-cols-3 gap-4">
         {/* Header */}
-        <div className="mb-8 space-y-2 lg:sticky lg:top-28 lg:self-start lg:h-fit">
+        <div className="mb-0.5 space-y-2 lg:sticky lg:top-28 lg:self-start lg:h-fit">
           <div className="mb-8 lg:mb-4 flex lg:block items-center justify-between space-y-3 pr-9">
             <div>
               <h1 className="text-4xl font-bold mb-2 text-foreground">
@@ -388,6 +401,16 @@ const Requests = () => {
           open={fulfillDialogOpen}
           onOpenChange={setFulfillDialogOpen}
           onSuccess={() => refetch()}
+        />
+      )}
+
+      {/* View Request Details Dialog */}
+      {viewDetailsRequest && (
+        <ViewRequestDetails
+          request={viewDetailsRequest}
+          open={viewDetailsOpen}
+          onOpenChange={setViewDetailsOpen}
+          onDelete={(requestId) => deleteRequest.mutate(requestId)}
         />
       )}
     </div>
