@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./pages/auth/auth.context";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/home";
 import Donors from "./pages/donor";
 import DonorLogin from "./pages/auth/login";
@@ -30,19 +31,80 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route element={<Layout />}>
+            {/* Public routes - accessible to everyone */}
             <Route path="/" element={<Home />} />
-            <Route path="/donors" element={<Donors />} />
             <Route path="/donor-login" element={<DonorLogin />} />
-            <Route path="/requests" element={<Requests />} />
             <Route path="/donor-register" element={<DonorRegister />} />
-            <Route path="/inventory" element={<Inventory />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/schedule-drive" element={<ScheduleDrive />} />
             <Route path="/learn-more" element={<LearnMore/>}/>
-            <Route path="/drive/:driveId" element={<DriveDetails />} />
             <Route path="*" element={<NotFound />} />
-            <Route path="/create-request" element={<CreateRequest />} />
-            <Route path="/account" element={<Account />} />
+            
+            {/* Auth required routes - accessible to authenticated users */}
+            <Route 
+              path="/requests" 
+              element={
+                <ProtectedRoute requireAuth>
+                  <Requests />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute requireAuth>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/account" 
+              element={
+                <ProtectedRoute requireAuth>
+                  <Account />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Admin only routes - accessible only to admin users */}
+            <Route 
+              path="/donors" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Donors />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/inventory" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Inventory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/schedule-drive" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <ScheduleDrive />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/drive/:driveId" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <DriveDetails />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/create-request" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CreateRequest />
+                </ProtectedRoute>
+              } 
+            />
           </Route>
         </Routes>
       </BrowserRouter>

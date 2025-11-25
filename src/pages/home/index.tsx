@@ -1,8 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
 import {
   Carousel,
   CarouselContent,
@@ -52,7 +50,7 @@ const Home = () => {
           >
             <CarouselContent className="h-full">
               {[heroImage1, heroImage2, heroImage3].map((image, index) => (
-                <CarouselItem key={index}>
+                <CarouselItem key={index - 1}>
                   <div
                     className="h-[800px] w-full"
                     style={{
@@ -73,7 +71,7 @@ const Home = () => {
             <Badge variant="emergency" className="mb-4">
               Philippine Red Cross
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-blue-950 tracking-tight">
               AlayDugo Blood Bank Management System
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
@@ -119,9 +117,6 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer />
     </>
   );
 };
