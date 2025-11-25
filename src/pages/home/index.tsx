@@ -8,9 +8,10 @@ import Footer from "@/components/footer";
 import { Link } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import useHome from "./home.hook";
+import Loading from "@/components/loading";
 
 const Home = () => {
-  const { userProfile, authenticated, getInitials, session, signOut } =
+  const { activeDonorsCount, totalUnits, emergencyRequests, urgentRequests, inventoryStatus } =
     useHome();
 
   return (
@@ -52,7 +53,13 @@ const Home = () => {
       </section>
 
       {/* DASHBOARD */}
-      <Dashboard />
+      <Dashboard
+        activeDonorsCount={activeDonorsCount}
+        totalUnits={totalUnits}
+        emergencyRequests={emergencyRequests}
+        urgentRequests={urgentRequests}
+        inventoryStatus={inventoryStatus}
+      />
 
       {/* CTA Section */}
       <section className="py-20 bg-primary text-primary-foreground">
