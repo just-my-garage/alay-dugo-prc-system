@@ -1,3 +1,4 @@
+import { useState } from "react";
 import {
   Card,
   CardContent,
@@ -20,6 +21,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { RecordNewUnit } from "./Inventory/components/RecordNewUnit";
 
 interface InventoryItem {
   bloodType: string;
@@ -31,6 +33,8 @@ interface InventoryItem {
 }
 
 const Inventory = () => {
+  const [isRecordDialogOpen, setIsRecordDialogOpen] = useState(false);
+  
   // Fetch blood units data from database
   const { data: bloodUnits = [] } = useQuery({
     queryKey: ["blood-units"],
@@ -213,7 +217,9 @@ const Inventory = () => {
               <Package className="mr-2 h-4 w-4" />
               Export Report
             </Button>
-            <Button variant="default">Record New Unit</Button>
+            <Button variant="default" onClick={() => setIsRecordDialogOpen(true)}>
+              Record New Unit
+            </Button>
           </div>
         </div>
 
@@ -456,6 +462,12 @@ const Inventory = () => {
 
       {/* Footer */}
       <Footer />
+
+      {/* Record New Unit Dialog */}
+      <RecordNewUnit 
+        open={isRecordDialogOpen} 
+        onOpenChange={setIsRecordDialogOpen} 
+      />
     </div>
   );
 };
