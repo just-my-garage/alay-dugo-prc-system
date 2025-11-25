@@ -8,7 +8,7 @@ import Home from "./pages/home";
 import Donors from "./pages/donor";
 import DonorLogin from "./pages/auth/login";
 import DonorRegister from "./pages/auth/register";
-import Inventory from "./pages/Inventory";
+import Inventory from "./pages/inventory";
 import Requests from "./pages/blood-requests";
 import CreateRequest from "./pages/blood-requests/components/CreateRequest";
 import Profile from "./pages/Profile";

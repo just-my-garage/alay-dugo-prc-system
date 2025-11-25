@@ -21,7 +21,7 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { RecordNewUnit } from "./Inventory/components/RecordNewUnit";
+import { RecordNewUnit } from './components/RecordNewUnit'
 import { useBloodInventory } from "@/hooks/use-blood-inventory";
 
 const Inventory = () => {
