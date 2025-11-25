@@ -27,8 +27,20 @@ import NewDonorComponent from "./components/new-donor";
 import Loading from "@/components/loading";
 
 const Donors = () => {
-  const { fetch, isLoading, handleDelete, searchQuery, setSearchQuery } =
-    useDonorPage();
+  const { 
+    fetch, 
+    isLoading, 
+    handleDelete, 
+    searchQuery, 
+    setSearchQuery,
+    currentPage,
+    totalPages,
+    totalCount,
+    itemsPerPage,
+    handleNextPage,
+    handlePreviousPage,
+    handlePageClick,
+  } = useDonorPage();
   const [showRegistration, setShowRegistration] = useState(false);
 
   return (
@@ -96,7 +108,7 @@ const Donors = () => {
             {isLoading ? (
               <Loading component={true} />
             ) : (
-              <div className="space-y-4">
+              <div className="lg:grid grid-cols-2 gap-4">
                 {fetch.data?.map((donor: any) => {
                   const formatDate = (dateString: string) => {
                     if (!dateString) return "N/A";
@@ -199,6 +211,59 @@ const Donors = () => {
             )}
           </CardContent>
         </Card>
+
+        {/* Pagination Controls */}
+        {!isLoading && fetch.data && fetch.data.length > 0 && (
+          <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-sm text-muted-foreground">
+              Showing {Math.min((currentPage - 1) * itemsPerPage + 1, totalCount)} to{" "}
+              {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount} donors
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePreviousPage}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
+                  let pageNum: number;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => handlePageClick(pageNum)}
+                      className="min-w-[40px]"
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNextPage}
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        )}
       </div>
 
       <Footer />
