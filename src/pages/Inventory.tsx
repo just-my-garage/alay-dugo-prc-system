@@ -18,74 +18,56 @@ import {
 } from "lucide-react";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+
+interface InventoryItem {
+  bloodType: string;
+  total: number;
+  available: number;
+  inTesting: number;
+  expiringSoon: number;
+  trend: "up" | "down" | "stable";
+}
 
 const Inventory = () => {
-  const inventoryData = [
-    {
-      bloodType: "O+",
-      total: 342,
-      available: 312,
-      inTesting: 20,
-      expiringSoon: 10,
-      trend: "up",
+  // Fetch blood units data from database
+  const { data: bloodUnits = [] } = useQuery({
+    queryKey: ["blood-units"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blood_units")
+        .select("blood_type, status, expiry_date");
+      
+      if (error) throw error;
+      return data || [];
     },
-    {
-      bloodType: "O-",
-      total: 87,
-      available: 75,
-      inTesting: 8,
-      expiringSoon: 4,
-      trend: "down",
-    },
-    {
-      bloodType: "A+",
-      total: 256,
-      available: 234,
-      inTesting: 15,
-      expiringSoon: 7,
-      trend: "up",
-    },
-    {
-      bloodType: "A-",
-      total: 134,
-      available: 120,
-      inTesting: 10,
-      expiringSoon: 4,
-      trend: "stable",
-    },
-    {
-      bloodType: "B+",
-      total: 198,
-      available: 180,
-      inTesting: 12,
-      expiringSoon: 6,
-      trend: "up",
-    },
-    {
-      bloodType: "B-",
-      total: 76,
-      available: 68,
-      inTesting: 5,
-      expiringSoon: 3,
-      trend: "down",
-    },
-    {
-      bloodType: "AB+",
-      total: 145,
-      available: 132,
-      inTesting: 8,
-      expiringSoon: 5,
-      trend: "stable",
-    },
-    {
-      bloodType: "AB-",
-      total: 52,
-      available: 45,
-      inTesting: 4,
-      expiringSoon: 3,
-      trend: "down",
-    },
-  ];
+  });
+
+  // Calculate inventory data from database
+  const inventoryData: InventoryItem[] = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"].map((bloodType) => {
+    const unitsOfType = bloodUnits.filter((unit) => unit.blood_type === bloodType);
+    const total = unitsOfType.length;
+    const available = unitsOfType.filter((unit) => unit.status === "In-Storage").length;
+    const inTesting = unitsOfType.filter((unit) => unit.status === "In-Testing").length;
+    
+    // Calculate expiring soon (within 7 days)
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
+    const expiringSoon = unitsOfType.filter((unit) => {
+      const expiryDate = new Date(unit.expiry_date);
+      return expiryDate <= sevenDaysFromNow && expiryDate >= new Date();
+    }).length;
+
+    return {
+      bloodType,
+      total,
+      available,
+      inTesting,
+      expiringSoon,
+      trend: "stable" as const,
+    };
+  });
 
   const centerInventory = [
     { center: "Manila PRC Center", bloodType: "O-", units: 32, status: "low" },
@@ -131,23 +113,14 @@ const Inventory = () => {
     return <Badge variant="success">Good</Badge>;
   };
 
+  // Calculate summary statistics
+  const totalUnits = inventoryData.reduce((sum, item) => sum + item.total, 0);
+  const availableUnits = inventoryData.reduce((sum, item) => sum + item.available, 0);
+  const inTestingUnits = inventoryData.reduce((sum, item) => sum + item.inTesting, 0);
+  const expiringSoonUnits = inventoryData.reduce((sum, item) => sum + item.expiringSoon, 0);
+
   const exportToCSV = () => {
     const timestamp = new Date().toISOString().split("T")[0];
-
-    // Summary data
-    const totalUnits = inventoryData.reduce((sum, item) => sum + item.total, 0);
-    const availableUnits = inventoryData.reduce(
-      (sum, item) => sum + item.available,
-      0
-    );
-    const inTestingUnits = inventoryData.reduce(
-      (sum, item) => sum + item.inTesting,
-      0
-    );
-    const expiringSoonUnits = inventoryData.reduce(
-      (sum, item) => sum + item.expiringSoon,
-      0
-    );
 
     let csvContent = "AlayDugo Blood Inventory Report\n";
     csvContent += `Generated: ${new Date().toLocaleString()}\n\n`;
@@ -224,10 +197,11 @@ const Inventory = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 Total Units
               </div>
-              <div className="text-3xl font-bold text-foreground">2,847</div>
-              <div className="text-xs text-success flex items-center gap-1 mt-1">
-                <TrendingUp className="h-3 w-3" />
-                +8% this week
+              <div className="text-3xl font-bold text-foreground">
+                {totalUnits.toLocaleString()}
+              </div>
+              <div className="text-xs text-muted-foreground mt-1">
+                Across all blood types
               </div>
             </CardContent>
           </Card>
@@ -237,9 +211,11 @@ const Inventory = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 Available
               </div>
-              <div className="text-3xl font-bold text-foreground">2,586</div>
+              <div className="text-3xl font-bold text-foreground">
+                {availableUnits.toLocaleString()}
+              </div>
               <div className="text-xs text-muted-foreground mt-1">
-                91% of total inventory
+                {totalUnits > 0 ? Math.round((availableUnits / totalUnits) * 100) : 0}% of total inventory
               </div>
             </CardContent>
           </Card>
@@ -249,7 +225,9 @@ const Inventory = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 In Testing
               </div>
-              <div className="text-3xl font-bold text-foreground">163</div>
+              <div className="text-3xl font-bold text-foreground">
+                {inTestingUnits.toLocaleString()}
+              </div>
               <div className="text-xs text-muted-foreground mt-1">
                 Awaiting clearance
               </div>
@@ -261,7 +239,9 @@ const Inventory = () => {
               <div className="text-sm text-muted-foreground mb-1">
                 Expiring Soon
               </div>
-              <div className="text-3xl font-bold text-warning">98</div>
+              <div className="text-3xl font-bold text-warning">
+                {expiringSoonUnits.toLocaleString()}
+              </div>
               <div className="text-xs text-warning flex items-center gap-1 mt-1">
                 <AlertCircle className="h-3 w-3" />
                 Within 7 days
