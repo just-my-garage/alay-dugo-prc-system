@@ -14,8 +14,16 @@ import {
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useBloodInventory } from "@/hooks/use-blood-inventory";
+import { useBloodRequests } from "@/hooks/use-blood-requests";
 
 const Dashboard = () => {
+  // Get total units from shared inventory hook
+  const { totalUnits } = useBloodInventory();
+  
+  // Get emergency requests from shared blood requests hook
+  const { emergencyRequests, urgentRequests } = useBloodRequests();
+
   // Fetch active donors count
   const { data: activeDonorsCount = 0 } = useQuery({
     queryKey: ["active-donors-count"],
@@ -65,13 +73,6 @@ const Dashboard = () => {
     },
   });
 
-  const emergencyRequests = [
-    { id: 1, hospital: "Manila General Hospital", bloodType: "O-", units: 5, time: "15 mins ago" },
-    { id: 2, hospital: "Cebu Medical Center", bloodType: "AB+", units: 3, time: "32 mins ago" },
-    { id: 3, hospital: "Davao Regional Hospital", bloodType: "A+", units: 4, time: "1 hour ago" },
-  ];
-
-
   const upcomingDrives = [
     { id: 1, name: "Makati Blood Drive", location: "Makati City Hall", date: "Jan 28, 2025" },
     { id: 2, name: "University of Manila Drive", location: "UM Campus", date: "Jan 30, 2025" },
@@ -114,7 +115,7 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Units in Stock</div>
-                  <div className="text-3xl font-bold text-foreground">2,847</div>
+                  <div className="text-3xl font-bold text-foreground">{totalUnits.toLocaleString()}</div>
                   <div className="text-xs text-warning flex items-center gap-1 mt-1">
                     <AlertCircle className="h-3 w-3" />
                     3 types below threshold
@@ -132,10 +133,10 @@ const Dashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Emergency Requests</div>
-                  <div className="text-3xl font-bold text-foreground">23</div>
+                  <div className="text-3xl font-bold text-foreground">{emergencyRequests.length}</div>
                   <div className="text-xs text-emergency flex items-center gap-1 mt-1">
                     <Clock className="h-3 w-3" />
-                    3 urgent
+                    {urgentRequests.length} urgent
                   </div>
                 </div>
                 <div className="p-3 bg-emergency/10 rounded-lg">
@@ -217,26 +218,35 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {emergencyRequests.map((request) => (
-                  <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 bg-emergency/10 rounded">
-                        <Droplets className="h-5 w-5 text-emergency" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">{request.hospital}</div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-2">
-                          <Badge variant="emergency">{request.bloodType}</Badge>
-                          <span>{request.units} units needed</span>
+                {emergencyRequests.length > 0 ? (
+                  emergencyRequests.slice(0, 3).map((request: any) => (
+                    <div key={request.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 bg-emergency/10 rounded">
+                          <Droplets className="h-5 w-5 text-emergency" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">{request.hospital}</div>
+                          <div className="text-sm text-muted-foreground flex items-wrap gap-2">
+                            {request.items.slice(0, 2).map((item: any, idx: number) => (
+                              <Badge key={idx} variant="emergency">{item.bloodType}</Badge>
+                            ))}
+                            <span>{request.items.reduce((sum: number, item: any) => sum + (item.requested - (item.fulfilled || 0)), 0)} units needed</span>
+                          </div>
                         </div>
                       </div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {request.requestDate}
+                      </div>
                     </div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {request.time}
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No emergency requests at this time</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>

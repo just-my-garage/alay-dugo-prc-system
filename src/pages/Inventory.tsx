@@ -22,31 +22,19 @@ import Footer from "@/components/footer";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { RecordNewUnit } from "./Inventory/components/RecordNewUnit";
-
-interface InventoryItem {
-  bloodType: string;
-  total: number;
-  available: number;
-  inTesting: number;
-  expiringSoon: number;
-  trend: "up" | "down" | "stable";
-}
+import { useBloodInventory } from "@/hooks/use-blood-inventory";
 
 const Inventory = () => {
   const [isRecordDialogOpen, setIsRecordDialogOpen] = useState(false);
   
-  // Fetch blood units data from database
-  const { data: bloodUnits = [] } = useQuery({
-    queryKey: ["blood-units"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("blood_units")
-        .select("blood_type, status, expiry_date");
-      
-      if (error) throw error;
-      return data || [];
-    },
-  });
+  // Use shared blood inventory hook
+  const {
+    inventoryData,
+    totalUnits,
+    availableUnits,
+    inTestingUnits,
+    expiringSoonUnits,
+  } = useBloodInventory();
 
   // Fetch urgent blood requests for low stock alerts
   const { data: lowStockAlerts = [] } = useQuery({
@@ -85,31 +73,6 @@ const Inventory = () => {
     },
   });
 
-  // Calculate inventory data from database
-  const inventoryData: InventoryItem[] = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"].map((bloodType) => {
-    const unitsOfType = bloodUnits.filter((unit) => unit.blood_type === bloodType);
-    const total = unitsOfType.length;
-    const available = unitsOfType.filter((unit) => unit.status === "In-Storage").length;
-    const inTesting = unitsOfType.filter((unit) => unit.status === "In-Testing").length;
-    
-    // Calculate expiring soon (within 7 days)
-    const sevenDaysFromNow = new Date();
-    sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7);
-    const expiringSoon = unitsOfType.filter((unit) => {
-      const expiryDate = new Date(unit.expiry_date);
-      return expiryDate <= sevenDaysFromNow && expiryDate >= new Date();
-    }).length;
-
-    return {
-      bloodType,
-      total,
-      available,
-      inTesting,
-      expiringSoon,
-      trend: "stable" as const,
-    };
-  });
-
 
   const recentTransfers = [
     {
@@ -143,12 +106,6 @@ const Inventory = () => {
     if (total < 150) return <Badge variant="warning">Low</Badge>;
     return <Badge variant="success">Good</Badge>;
   };
-
-  // Calculate summary statistics
-  const totalUnits = inventoryData.reduce((sum, item) => sum + item.total, 0);
-  const availableUnits = inventoryData.reduce((sum, item) => sum + item.available, 0);
-  const inTestingUnits = inventoryData.reduce((sum, item) => sum + item.inTesting, 0);
-  const expiringSoonUnits = inventoryData.reduce((sum, item) => sum + item.expiringSoon, 0);
 
   const exportToCSV = () => {
     const timestamp = new Date().toISOString().split("T")[0];

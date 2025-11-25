@@ -1,65 +1,24 @@
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { useState, useEffect } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
+import { useBloodRequests } from "@/hooks/use-blood-requests";
 
 const useBloodRequestsPage = () => {
   // CONTAINING ALL CRUD OPERATIONS FOR BLOOD REQUESTS PAGE
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const queryClient = useQueryClient();
 
-  const getBloodRequests = useQuery({
-    queryKey: ["blood-requests"],
-    queryFn: async () => {
-      setIsLoading(true);
-      const { data, error } = await supabase.from("hospitals").select(`
-          *,
-          blood_requests (
-            request_id,
-            urgency,
-            status,
-            request_datetime,
-              blood_request_items (
-                blood_type,
-                quantity_requested,
-                quantity_fulfilled
-              )
-          )
-        `);
-      setIsLoading(false);
-      if (error) {
-        throw new Error(error.message);
-      }
-      return data;
-    },
-  });
-
-    const allRequests = getBloodRequests.data?.flatMap((hospital: any) => 
-    hospital.blood_requests?.map((request: any) => ({
-      id: request.request_id,
-      hospital: hospital.hospital_name,
-      requestDate: new Date(request.request_datetime).toLocaleString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false
-      }),
-      urgency: request.urgency,
-      items: request.blood_request_items?.map((item: any) => ({
-        fulfilled: item.quantity_fulfilled, // You may need to add fulfilled quantity to your data model
-        bloodType: item.blood_type,
-        requested: item.quantity_requested,
-      })) || [],
-      status: request.status
-    })) || []
-  ) || [];
-
-  const pendingRequests = allRequests.filter((req: any) => req.status !== "Fulfilled");
-  const emergencyRequests = pendingRequests.filter((req: any) => req.urgency === "Emergency");
-  const urgentRequests = pendingRequests.filter((req: any) => req.urgency === "Urgent");
-  const routineRequests = pendingRequests.filter((req: any) => req.urgency === "Routine");
-  const fulfilledRequests = allRequests.filter((req: any) => req.status === "Fulfilled");
+  // Use shared blood requests hook
+  const {
+    allRequests,
+    pendingRequests,
+    emergencyRequests,
+    urgentRequests,
+    routineRequests,
+    fulfilledRequests,
+    isLoading: isLoadingRequests,
+  } = useBloodRequests();
 
   const deleteRequest = useMutation({
     mutationFn: async (requestId: number) => {
@@ -86,7 +45,8 @@ const useBloodRequestsPage = () => {
         title: "Success",
         description: "Blood request deleted successfully",
       });
-      getBloodRequests.refetch();
+      // Refetch the blood requests query
+      queryClient.invalidateQueries({ queryKey: ["blood-requests"] });
     },
     onError: (error: any) => {
       toast({
@@ -98,7 +58,7 @@ const useBloodRequestsPage = () => {
   });
 
   return {
-    isLoading,
+    isLoading: isLoading || isLoadingRequests,
     setIsLoading,
     allRequests,
     pendingRequests,
@@ -106,7 +66,7 @@ const useBloodRequestsPage = () => {
     urgentRequests,
     routineRequests,
     fulfilledRequests,
-    refetch: getBloodRequests.refetch,
+    refetch: () => queryClient.invalidateQueries({ queryKey: ["blood-requests"] }),
     deleteRequest,
   };
 };
