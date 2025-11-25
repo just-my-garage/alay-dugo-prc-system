@@ -29,22 +29,48 @@ const Dashboard = () => {
       return count || 0;
     },
   });
+
+  // Fetch blood inventory from database
+  const { data: inventoryStatus = [] } = useQuery({
+    queryKey: ["blood-inventory"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blood_units")
+        .select("blood_type")
+        .eq("status", "In-Storage");
+      
+      if (error) throw error;
+
+      // Count units by blood type
+      const counts = data.reduce((acc, unit) => {
+        acc[unit.blood_type] = (acc[unit.blood_type] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      // Define all blood types
+      const bloodTypes = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"];
+
+      // Map to inventory status with thresholds
+      return bloodTypes.map(bloodType => {
+        const units = counts[bloodType] || 0;
+        let status: "good" | "medium" | "low" | "critical";
+        
+        if (units >= 200) status = "good";
+        else if (units >= 100) status = "medium";
+        else if (units >= 75) status = "low";
+        else status = "critical";
+
+        return { bloodType, units, status };
+      });
+    },
+  });
+
   const emergencyRequests = [
     { id: 1, hospital: "Manila General Hospital", bloodType: "O-", units: 5, time: "15 mins ago" },
     { id: 2, hospital: "Cebu Medical Center", bloodType: "AB+", units: 3, time: "32 mins ago" },
     { id: 3, hospital: "Davao Regional Hospital", bloodType: "A+", units: 4, time: "1 hour ago" },
   ];
 
-  const inventoryStatus = [
-    { bloodType: "O+", units: 342, status: "good" },
-    { bloodType: "O-", units: 87, status: "low" },
-    { bloodType: "A+", units: 256, status: "good" },
-    { bloodType: "A-", units: 134, status: "medium" },
-    { bloodType: "B+", units: 198, status: "good" },
-    { bloodType: "B-", units: 76, status: "low" },
-    { bloodType: "AB+", units: 145, status: "medium" },
-    { bloodType: "AB-", units: 52, status: "critical" },
-  ];
 
   const upcomingDrives = [
     { id: 1, name: "Makati Blood Drive", location: "Makati City Hall", date: "Jan 28, 2025" },
