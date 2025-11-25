@@ -11,8 +11,14 @@ import useHome from "./home.hook";
 import Loading from "@/components/loading";
 
 const Home = () => {
-  const { activeDonorsCount, totalUnits, emergencyRequests, urgentRequests, inventoryStatus } =
-    useHome();
+  const {
+    activeDonorsCount,
+    totalUnits,
+    emergencyRequests,
+    urgentRequests,
+    inventoryStatus,
+    donationDrives,
+  } = useHome();
 
   return (
     <div className="min-h-screen">
@@ -59,6 +65,7 @@ const Home = () => {
         emergencyRequests={emergencyRequests}
         urgentRequests={urgentRequests}
         inventoryStatus={inventoryStatus}
+        donationDrives={donationDrives}
       />
 
       {/* CTA Section */}

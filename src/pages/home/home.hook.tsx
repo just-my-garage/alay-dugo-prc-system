@@ -6,17 +6,6 @@ import { useBloodInventory } from "@/hooks/use-blood-inventory";
 import { useBloodRequests } from "@/hooks/use-blood-requests";
 
 const useHome = () => {
-  const { session, signOut } = useAuth();
-  const [userProfile, setUserProfile] = useState<{
-    first_name: string;
-    last_name: string;
-    email: string;
-  } | null>(null);
-
-  const authenticated = () => {
-    console.log(session);
-  };
-
   const { totalUnits } = useBloodInventory();
   const { emergencyRequests, urgentRequests } = useBloodRequests();
 
@@ -69,41 +58,27 @@ const useHome = () => {
     },
   });
 
-  const getInitials = () => {
-    if (!userProfile) return "U";
-    return `${userProfile.first_name?.[0] || ""}${
-      userProfile.last_name?.[0] || ""
-    }`.toUpperCase();
-  };
+  const { data: donationDrives } = useQuery({
+    queryKey: ["donation_drives"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("donation_drives")
+        .select("*")
+        .order("start_datetime", { ascending: false })
+        .limit(5);
 
-  useEffect(() => {
-    if (session?.user.email) {
-      const fetchProfile = async () => {
-        const { data } = await supabase
-          .from("users")
-          .select("first_name, last_name, email")
-          .eq("email", session.user.email)
-          .single();
-
-        if (data) {
-          setUserProfile(data);
-        }
-      };
-      fetchProfile();
-    }
-  }, [session]);
+      if (error) throw error;
+      return data;
+    },
+  });
 
   return {
-    userProfile,
-    authenticated,
-    getInitials,
-    session,
-    signOut,
     totalUnits,
     emergencyRequests,
     urgentRequests,
     activeDonorsCount,
     inventoryStatus,
+    donationDrives,
   };
 };
 
