@@ -14,6 +14,7 @@ import CreateRequest from "./pages/blood-requests/components/CreateRequest";
 import Profile from "./pages/Profile";
 import Account from "./pages/Account";
 import ScheduleDrive from "./pages/home/components/ScheduleDrive";
+import DriveDetails from "./pages/home/components/DriveDetails";
 import NotFound from "./pages/NotFound";
 import LearnMore from "./pages/LearnMore";
 
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/profile" element={<Profile />} />
           <Route path="/account" element={<Account />} />
           <Route path="/schedule-drive" element={<ScheduleDrive />} />
+          <Route path="/drive/:driveId" element={<DriveDetails />} />
           <Route path="/learn-more" element={<LearnMore/>}/>
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />

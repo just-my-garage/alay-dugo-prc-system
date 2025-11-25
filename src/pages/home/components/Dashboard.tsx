@@ -153,28 +153,31 @@ const Dashboard = ({
         <CardContent>
           <div className="grid md:grid-cols-3 gap-4">
             {donationDrives?.map((drive) => (
-              <div
+              <Link
                 key={drive.drive_id}
-                className="p-4 border rounded-lg hover:shadow-md transition-shadow"
+                to={`/drive/${drive.drive_id}`}
+                className="block"
               >
-                <div className="flex items-start gap-3">
-                  <div className="p-2 bg-primary/10 rounded">
-                    <Calendar className="h-5 w-5 text-primary" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="font-semibold text-foreground mb-1">
-                      {drive.drive_name}
+                <div className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer hover:border-primary">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-primary/10 rounded">
+                      <Calendar className="h-5 w-5 text-primary" />
                     </div>
-                    <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-                      <MapPin className="h-3 w-3" />
-                      {drive.venue_address}
+                    <div className="flex-1">
+                      <div className="font-semibold text-foreground mb-1">
+                        {drive.drive_name}
+                      </div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                        <MapPin className="h-3 w-3" />
+                        {drive.venue_address}
+                      </div>
+                      <Badge variant="outline">
+                        {new Date(drive.start_datetime).toLocaleDateString()}
+                      </Badge>
                     </div>
-                    <Badge variant="outline">
-                      {new Date(drive.start_datetime).toLocaleDateString()}
-                    </Badge>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </CardContent>
