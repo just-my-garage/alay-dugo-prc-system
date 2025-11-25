@@ -7,6 +7,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Droplets,
   AlertCircle,
@@ -28,9 +29,11 @@ const Requests = () => {
   const {
     isLoading,
     allRequests,
+    pendingRequests,
     emergencyRequests,
     urgentRequests,
     routineRequests,
+    fulfilledRequests,
     refetch,
     deleteRequest,
   } = useBloodRequestsPage();
@@ -39,6 +42,7 @@ const Requests = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [viewDetailsRequest, setViewDetailsRequest] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState("all");
 
   const handleFulfillClick = (request: any) => {
     setSelectedRequest(request);
@@ -330,64 +334,152 @@ const Requests = () => {
         </div>
 
         <div className="col-span-2">
-          {/* Emergency Requests */}
-          {emergencyRequests.length > 0 && (
-            <Card className="mb-8 border-emergency/20">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2 text-emergency">
-                  <AlertCircle className="h-5 w-5" />
-                  Emergency Requests
-                </CardTitle>
-                <CardDescription>
-                  Critical blood requests requiring immediate attention
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {emergencyRequests.map((request) => (
-                    <RequestCard key={request.id} request={request} />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList className="grid w-full grid-cols-5 mb-6">
+              <TabsTrigger value="all">
+                All ({pendingRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="emergency" className="data-[state=active]:text-emergency">
+                Emergency ({emergencyRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="urgent" className="data-[state=active]:text-warning">
+                Urgent ({urgentRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="routine">
+                Routine ({routineRequests.length})
+              </TabsTrigger>
+              <TabsTrigger value="fulfilled" className="data-[state=active]:text-success">
+                Fulfilled ({fulfilledRequests.length})
+              </TabsTrigger>
+            </TabsList>
 
-          {/* Urgent Requests */}
-          {urgentRequests.length > 0 && (
-            <Card className="mb-8">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Clock className="h-5 w-5 text-warning" />
-                  Urgent Requests
-                </CardTitle>
-                <CardDescription>Time-sensitive blood requests</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {urgentRequests.map((request) => (
-                    <RequestCard key={request.id} request={request} />
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+            <TabsContent value="all">
+              <Card>
+                <CardHeader>
+                  <CardTitle>All Pending Requests</CardTitle>
+                  <CardDescription>
+                    View all pending blood requests across all priority levels
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {pendingRequests.length > 0 ? (
+                    <div className="space-y-4">
+                      {pendingRequests.map((request) => (
+                        <RequestCard key={request.id} request={request} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No pending requests found
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-          {/* Routine Requests */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Routine Requests</CardTitle>
-              <CardDescription>
-                Standard blood requests and fulfillment history
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {routineRequests.map((request) => (
-                  <RequestCard key={request.id} request={request} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+            <TabsContent value="emergency">
+              <Card className="border-emergency/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-emergency">
+                    <AlertCircle className="h-5 w-5" />
+                    Emergency Requests
+                  </CardTitle>
+                  <CardDescription>
+                    Critical blood requests requiring immediate attention
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {emergencyRequests.length > 0 ? (
+                    <div className="space-y-4">
+                      {emergencyRequests.map((request) => (
+                        <RequestCard key={request.id} request={request} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No emergency requests at this time
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="urgent">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Clock className="h-5 w-5 text-warning" />
+                    Urgent Requests
+                  </CardTitle>
+                  <CardDescription>Time-sensitive blood requests</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {urgentRequests.length > 0 ? (
+                    <div className="space-y-4">
+                      {urgentRequests.map((request) => (
+                        <RequestCard key={request.id} request={request} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No urgent requests at this time
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="routine">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Routine Requests</CardTitle>
+                  <CardDescription>
+                    Standard blood requests and fulfillment history
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {routineRequests.length > 0 ? (
+                    <div className="space-y-4">
+                      {routineRequests.map((request) => (
+                        <RequestCard key={request.id} request={request} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No routine requests at this time
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="fulfilled">
+              <Card className="border-success/20">
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-success">
+                    <CheckCircle className="h-5 w-5" />
+                    Fulfilled Requests
+                  </CardTitle>
+                  <CardDescription>
+                    Completed blood requests with full fulfillment
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {fulfilledRequests.length > 0 ? (
+                    <div className="space-y-4">
+                      {fulfilledRequests.map((request) => (
+                        <RequestCard key={request.id} request={request} />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-muted-foreground">
+                      No fulfilled requests yet
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
       </div>
 

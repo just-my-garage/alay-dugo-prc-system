@@ -55,9 +55,11 @@ const useBloodRequestsPage = () => {
     })) || []
   ) || [];
 
-  const emergencyRequests = allRequests.filter((req: any) => req.urgency === "Emergency");
-  const urgentRequests = allRequests.filter((req: any) => req.urgency === "Urgent");
-  const routineRequests = allRequests.filter((req: any) => req.urgency === "Routine");
+  const pendingRequests = allRequests.filter((req: any) => req.status !== "Fulfilled");
+  const emergencyRequests = pendingRequests.filter((req: any) => req.urgency === "Emergency");
+  const urgentRequests = pendingRequests.filter((req: any) => req.urgency === "Urgent");
+  const routineRequests = pendingRequests.filter((req: any) => req.urgency === "Routine");
+  const fulfilledRequests = allRequests.filter((req: any) => req.status === "Fulfilled");
 
   const deleteRequest = useMutation({
     mutationFn: async (requestId: number) => {
@@ -99,9 +101,11 @@ const useBloodRequestsPage = () => {
     isLoading,
     setIsLoading,
     allRequests,
+    pendingRequests,
     emergencyRequests,
     urgentRequests,
     routineRequests,
+    fulfilledRequests,
     refetch: getBloodRequests.refetch,
     deleteRequest,
   };
