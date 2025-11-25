@@ -41,10 +41,6 @@ const Requests = () => {
     setFulfillDialogOpen(true);
   };
 
-  const handleFulfillSuccess = () => {
-    refetch();
-  };
-
   // Process data from API
 
   const getUrgencyBadge = (urgency: string) => {
@@ -111,70 +107,96 @@ const Requests = () => {
       </div>
 
       <div className="space-y-2 mb-4">
-        {request.items.map((item: any, index: number) => (
-          <div
-            key={index}
-            className="flex items-center justify-between p-3 bg-secondary/30 rounded-lg"
-          >
-            <div className="flex items-center gap-3">
-              <Droplets className="h-5 w-5 text-primary" />
-              <div>
-                <div className="font-semibold text-foreground">
-                  {item.bloodType}
+        {request.items.map((item: any, index: number) => {
+          const progress = (item.fulfilled / item.requested) * 100;
+          return (
+            <div key={index} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Droplets className="h-4 w-4 text-primary" />
+                  <span className="font-semibold text-foreground text-sm">
+                    {item.bloodType}
+                  </span>
                 </div>
-                <div className="text-sm text-muted-foreground">Blood Type</div>
+                <span className="text-sm text-muted-foreground">
+                  {item.fulfilled} / {item.requested} units
+                </span>
+              </div>
+              <div className="relative h-2 bg-secondary rounded-full overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-300 ${
+                    progress === 100
+                      ? "bg-success"
+                      : progress > 0
+                      ? "bg-warning"
+                      : "bg-muted"
+                  }`}
+                  style={{ width: `${progress}%` }}
+                />
               </div>
             </div>
-            <div className="text-right">
-              <div className="font-semibold text-foreground">
-                {item.fulfilled} / {item.requested} units
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {item.fulfilled === item.requested ? "Complete" : "In Progress"}
-              </div>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       <div className="flex gap-2">
-        {request.status === "Pending" && (
-          <>
-            <Button 
-              variant="success" 
-              size="sm" 
-              className="flex-1"
-              onClick={() => handleFulfillClick(request)}
-            >
-              <CheckCircle className="mr-2 h-4 w-4" />
-              Fulfill Request
-            </Button>
-            <Button variant="outline" size="sm">
-              View Details
-            </Button>
-          </>
-        )}
-        {request.status === "Partially Fulfilled" && (
-          <>
-            <Button 
-              variant="default" 
-              size="sm" 
-              className="flex-1"
-              onClick={() => handleFulfillClick(request)}
-            >
-              <Package className="mr-2 h-4 w-4" />
-              Complete Fulfillment
-            </Button>
-            <Button variant="outline" size="sm">
-              View Details
-            </Button>
-          </>
+        {request.status !== "Fulfilled" && (
+          <button
+            onClick={() => handleFulfillClick(request)}
+            className={`flex-1 relative overflow-hidden rounded-md border transition-all hover:scale-[1.02] ${
+              request.status === "Pending"
+                ? "border-success/20 bg-success/5 hover:bg-success/10"
+                : "border-warning/20 bg-warning/5 hover:bg-warning/10"
+            }`}
+          >
+            <div className="relative z-10 flex items-center justify-center gap-2 py-2 px-4">
+              {request.status === "Pending" ? (
+                <>
+                  <CheckCircle className="h-4 w-4 text-success" />
+                  <span className="font-medium text-success">
+                    Fulfill Request
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Package className="h-4 w-4 text-warning" />
+                  <span className="font-medium text-warning">
+                    Complete Fulfillment
+                  </span>
+                </>
+              )}
+            </div>
+            <div
+              className={`absolute inset-0 transition-all ${
+                request.status === "Pending" ? "bg-success/10" : "bg-warning/10"
+              }`}
+              style={{
+                width: `${
+                  (request.items.reduce(
+                    (sum: number, item: any) => sum + item.fulfilled,
+                    0
+                  ) /
+                    request.items.reduce(
+                      (sum: number, item: any) => sum + item.requested,
+                      0
+                    )) *
+                  100
+                }%`,
+              }}
+            />
+          </button>
         )}
         {request.status === "Fulfilled" && (
-          <Button variant="outline" size="sm" className="w-full">
-            View Details
-          </Button>
+          <div className="flex-1 relative overflow-hidden rounded-md border border-success/20 bg-success/10">
+            <div className="flex items-center justify-center gap-2 py-2 px-4">
+              <CheckCircle className="h-4 w-4 text-success" />
+              <span className="font-medium text-success">Fulfilled</span>
+            </div>
+          </div>
         )}
+        <Button variant="outline" size="sm">
+          View Details
+        </Button>
       </div>
     </div>
   );
@@ -184,7 +206,7 @@ const Requests = () => {
       <div className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-32">
-          <Loading component={true}/>
+          <Loading component={true} />
         </div>
         <Footer />
       </div>
@@ -196,27 +218,27 @@ const Requests = () => {
       {/* Navigation */}
       <Header />
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 lg:grid grid-cols-3 gap-4">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold mb-2 text-foreground">
-              Blood Requests
-            </h1>
-            <p className="text-muted-foreground">
-              Manage and fulfill hospital blood requests
-            </p>
+        <div className="mb-8 space-y-2 lg:sticky lg:top-28 lg:self-start lg:h-fit">
+          <div className="mb-8 lg:mb-4 flex lg:block items-center justify-between space-y-3 pr-9">
+            <div>
+              <h1 className="text-4xl font-bold mb-2 text-foreground">
+                Blood Requests
+              </h1>
+              <p className="text-muted-foreground">
+                Manage and fulfill hospital blood requests
+              </p>
+            </div>
+            <Button variant="default" size="lg" asChild className="lg:mt-8">
+              <Link to="/create-request">
+                <AlertCircle className="mr-2 h-5 w-5" />
+                New Request
+              </Link>
+            </Button>
           </div>
-          <Button variant="default" size="lg" asChild>
-            <Link to="/create-request">
-              <AlertCircle className="mr-2 h-5 w-5" />
-              New Request
-            </Link>
-          </Button>
-        </div>
 
-        {/* Summary Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+          {/* Summary Cards */}
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -294,64 +316,66 @@ const Requests = () => {
           </Card>
         </div>
 
-        {/* Emergency Requests */}
-        {emergencyRequests.length > 0 && (
-          <Card className="mb-8 border-emergency/20">
+        <div className="col-span-2">
+          {/* Emergency Requests */}
+          {emergencyRequests.length > 0 && (
+            <Card className="mb-8 border-emergency/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-emergency">
+                  <AlertCircle className="h-5 w-5" />
+                  Emergency Requests
+                </CardTitle>
+                <CardDescription>
+                  Critical blood requests requiring immediate attention
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {emergencyRequests.map((request) => (
+                    <RequestCard key={request.id} request={request} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Urgent Requests */}
+          {urgentRequests.length > 0 && (
+            <Card className="mb-8">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Clock className="h-5 w-5 text-warning" />
+                  Urgent Requests
+                </CardTitle>
+                <CardDescription>Time-sensitive blood requests</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {urgentRequests.map((request) => (
+                    <RequestCard key={request.id} request={request} />
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Routine Requests */}
+          <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-emergency">
-                <AlertCircle className="h-5 w-5" />
-                Emergency Requests
-              </CardTitle>
+              <CardTitle>Routine Requests</CardTitle>
               <CardDescription>
-                Critical blood requests requiring immediate attention
+                Standard blood requests and fulfillment history
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {emergencyRequests.map((request) => (
+                {routineRequests.map((request) => (
                   <RequestCard key={request.id} request={request} />
                 ))}
               </div>
             </CardContent>
           </Card>
-        )}
-
-        {/* Urgent Requests */}
-        {urgentRequests.length > 0 && (
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-warning" />
-                Urgent Requests
-              </CardTitle>
-              <CardDescription>Time-sensitive blood requests</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {urgentRequests.map((request) => (
-                  <RequestCard key={request.id} request={request} />
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Routine Requests */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Routine Requests</CardTitle>
-            <CardDescription>
-              Standard blood requests and fulfillment history
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {routineRequests.map((request) => (
-                <RequestCard key={request.id} request={request} />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        </div>
       </div>
 
       {/* Footer */}
@@ -363,7 +387,7 @@ const Requests = () => {
           request={selectedRequest}
           open={fulfillDialogOpen}
           onOpenChange={setFulfillDialogOpen}
-          onSuccess={handleFulfillSuccess}
+          onSuccess={() => refetch()}
         />
       )}
     </div>
