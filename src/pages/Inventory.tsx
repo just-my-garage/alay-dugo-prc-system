@@ -44,6 +44,43 @@ const Inventory = () => {
     },
   });
 
+  // Fetch urgent blood requests for low stock alerts
+  const { data: lowStockAlerts = [] } = useQuery({
+    queryKey: ["low-stock-alerts"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("blood_requests")
+        .select(`
+          request_id,
+          urgency,
+          status,
+          hospitals (hospital_name),
+          blood_request_items (
+            blood_type,
+            quantity_requested,
+            quantity_fulfilled
+          )
+        `)
+        .in("urgency", ["Urgent", "Emergency"])
+        .in("status", ["Pending", "Partially Fulfilled"])
+        .order("request_datetime", { ascending: false })
+        .limit(5);
+      
+      if (error) throw error;
+      
+      // Transform data for display
+      return (data || []).flatMap((request: any) => 
+        (request.blood_request_items || []).map((item: any) => ({
+          hospital: request.hospitals?.hospital_name || "Unknown Hospital",
+          bloodType: item.blood_type,
+          unitsNeeded: item.quantity_requested - (item.quantity_fulfilled || 0),
+          status: request.urgency === "Emergency" ? "critical" : "low",
+          urgency: request.urgency
+        }))
+      ).filter((alert: any) => alert.unitsNeeded > 0).slice(0, 5);
+    },
+  });
+
   // Calculate inventory data from database
   const inventoryData: InventoryItem[] = ["O+", "O-", "A+", "A-", "B+", "B-", "AB+", "AB-"].map((bloodType) => {
     const unitsOfType = bloodUnits.filter((unit) => unit.blood_type === bloodType);
@@ -69,16 +106,6 @@ const Inventory = () => {
     };
   });
 
-  const centerInventory = [
-    { center: "Manila PRC Center", bloodType: "O-", units: 32, status: "low" },
-    {
-      center: "Cebu PRC Center",
-      bloodType: "AB-",
-      units: 18,
-      status: "critical",
-    },
-    { center: "Davao PRC Center", bloodType: "B-", units: 25, status: "low" },
-  ];
 
   const recentTransfers = [
     {
@@ -140,10 +167,10 @@ const Inventory = () => {
     });
 
     // Low stock alerts
-    csvContent += "\nLOW STOCK ALERTS\n";
-    csvContent += "Center,Blood Type,Units,Status\n";
-    centerInventory.forEach((item) => {
-      csvContent += `${item.center},${item.bloodType},${item.units},${item.status}\n`;
+    csvContent += "\nLOW STOCK ALERTS (URGENT REQUESTS)\n";
+    csvContent += "Hospital,Blood Type,Units Needed,Status\n";
+    lowStockAlerts.forEach((item: any) => {
+      csvContent += `${item.hospital},${item.bloodType},${item.unitsNeeded},${item.status}\n`;
     });
 
     // Recent transfers
@@ -259,44 +286,50 @@ const Inventory = () => {
                 Low Stock Alerts
               </CardTitle>
               <CardDescription>
-                PRC centers requiring urgent replenishment
+                Urgent blood requests requiring immediate attention
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                {centerInventory.map((item, index) => (
-                  <div key={index} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-semibold text-foreground">
-                          {item.center}
-                        </span>
-                      </div>
-                      <Badge
-                        variant={
-                          item.status === "critical" ? "emergency" : "warning"
-                        }
-                      >
-                        {item.status}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <div className="text-sm text-muted-foreground">
-                        Blood Type:{" "}
-                        <span className="font-semibold text-foreground">
-                          {item.bloodType}
-                        </span>
-                      </div>
-                      <div className="text-sm">
-                        <span className="font-semibold text-foreground">
-                          {item.units}
-                        </span>{" "}
-                        units remaining
-                      </div>
-                    </div>
+                {lowStockAlerts.length === 0 ? (
+                  <div className="p-4 text-center text-muted-foreground">
+                    No urgent blood requests at this time
                   </div>
-                ))}
+                ) : (
+                  lowStockAlerts.map((item: any, index: number) => (
+                    <div key={index} className="p-4 border rounded-lg">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4 text-muted-foreground" />
+                          <span className="font-semibold text-foreground">
+                            {item.hospital}
+                          </span>
+                        </div>
+                        <Badge
+                          variant={
+                            item.status === "critical" ? "emergency" : "warning"
+                          }
+                        >
+                          {item.urgency}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm text-muted-foreground">
+                          Blood Type:{" "}
+                          <span className="font-semibold text-foreground">
+                            {item.bloodType}
+                          </span>
+                        </div>
+                        <div className="text-sm">
+                          <span className="font-semibold text-foreground">
+                            {item.unitsNeeded}
+                          </span>{" "}
+                          units needed
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </CardContent>
           </Card>
