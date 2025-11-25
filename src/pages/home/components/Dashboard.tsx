@@ -182,7 +182,11 @@ const Dashboard = () => {
                   <CardTitle>Emergency Requests</CardTitle>
                   <CardDescription>Urgent blood requests requiring immediate attention</CardDescription>
                 </div>
-                <Button variant="emergency" size="sm">View All</Button>
+                <Button variant="emergency" size="sm">
+                  <Link to='/requests'>
+                  View All
+                  </Link>
+                </Button>
               </div>
             </CardHeader>
             <CardContent>
