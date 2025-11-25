@@ -17,6 +17,7 @@ import ScheduleDrive from "./pages/home/components/ScheduleDrive";
 import DriveDetails from "./pages/home/components/DriveDetails";
 import NotFound from "./pages/NotFound";
 import LearnMore from "./pages/LearnMore";
+import Layout from "./pages/Layout";
 
 const queryClient = new QueryClient();
 
@@ -28,20 +29,21 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/donors" element={<Donors />} />
-          <Route path="/donor-login" element={<DonorLogin />} />
-          <Route path="/donor-register" element={<DonorRegister />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/requests" element={<Requests />} />
-          <Route path="/create-request" element={<CreateRequest />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/schedule-drive" element={<ScheduleDrive />} />
-          <Route path="/drive/:driveId" element={<DriveDetails />} />
-          <Route path="/learn-more" element={<LearnMore/>}/>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route element={<Layout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/donors" element={<Donors />} />
+            <Route path="/donor-login" element={<DonorLogin />} />
+            <Route path="/requests" element={<Requests />} />
+            <Route path="/donor-register" element={<DonorRegister />} />
+            <Route path="/inventory" element={<Inventory />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/schedule-drive" element={<ScheduleDrive />} />
+            <Route path="/learn-more" element={<LearnMore/>}/>
+            <Route path="/drive/:driveId" element={<DriveDetails />} />
+            <Route path="*" element={<NotFound />} />
+            <Route path="/create-request" element={<CreateRequest />} />
+            <Route path="/account" element={<Account />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

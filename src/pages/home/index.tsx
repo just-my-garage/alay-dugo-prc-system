@@ -27,13 +27,15 @@ const Home = () => {
     urgentRequests,
     inventoryStatus,
     donationDrives,
+    isLoading,
   } = useHome();
 
-  return (
-    <div className="min-h-screen">
-      {/* Navigation */}
-      <Header />
+  if (isLoading) {
+    return <Loading component={false}/>;
+  }
 
+  return (
+    <>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         <div className="absolute inset-0 z-0">
@@ -120,7 +122,7 @@ const Home = () => {
 
       {/* Footer */}
       <Footer />
-    </div>
+    </>
   );
 };
 

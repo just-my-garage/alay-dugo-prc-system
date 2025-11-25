@@ -1,6 +1,5 @@
 import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
-import Footer from "@/components/footer";
 
 const NotFound = () => {
   const location = useLocation();
@@ -21,8 +20,6 @@ const NotFound = () => {
       </div>
 
     </div>
-      {/* Footer */}
-      <Footer />
     </>
   );
 };

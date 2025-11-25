@@ -18,8 +18,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import useBloodRequestsPage from "./requests.hook";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
 import Loading from "@/components/loading";
 import FulfillRequest from "./components/FulfillRequest";
 import ViewRequestDetails from "./components/ViewRequestDetails";
@@ -220,21 +218,13 @@ const Requests = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background">
-        <Header />
-        <div className="container mx-auto px-4 py-32">
-          <Loading component={true} />
-        </div>
-        <Footer />
-      </div>
+        <Loading component={false} />
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       {/* Navigation */}
-      <Header />
-
       <div className="container mx-auto px-4 py-8 lg:grid grid-cols-3 gap-4">
         {/* Header */}
         <div className="mb-0.5 space-y-2 lg:sticky lg:top-28 lg:self-start lg:h-fit">
@@ -339,16 +329,25 @@ const Requests = () => {
               <TabsTrigger value="all">
                 All ({pendingRequests.length})
               </TabsTrigger>
-              <TabsTrigger value="emergency" className="data-[state=active]:text-emergency">
+              <TabsTrigger
+                value="emergency"
+                className="data-[state=active]:text-emergency"
+              >
                 Emergency ({emergencyRequests.length})
               </TabsTrigger>
-              <TabsTrigger value="urgent" className="data-[state=active]:text-warning">
+              <TabsTrigger
+                value="urgent"
+                className="data-[state=active]:text-warning"
+              >
                 Urgent ({urgentRequests.length})
               </TabsTrigger>
               <TabsTrigger value="routine">
                 Routine ({routineRequests.length})
               </TabsTrigger>
-              <TabsTrigger value="fulfilled" className="data-[state=active]:text-success">
+              <TabsTrigger
+                value="fulfilled"
+                className="data-[state=active]:text-success"
+              >
                 Fulfilled ({fulfilledRequests.length})
               </TabsTrigger>
             </TabsList>
@@ -411,7 +410,9 @@ const Requests = () => {
                     <Clock className="h-5 w-5 text-warning" />
                     Urgent Requests
                   </CardTitle>
-                  <CardDescription>Time-sensitive blood requests</CardDescription>
+                  <CardDescription>
+                    Time-sensitive blood requests
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   {urgentRequests.length > 0 ? (
@@ -483,9 +484,6 @@ const Requests = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <Footer />
-
       {/* Fulfill Request Dialog */}
       {selectedRequest && (
         <FulfillRequest
@@ -505,7 +503,7 @@ const Requests = () => {
           onDelete={(requestId) => deleteRequest.mutate(requestId)}
         />
       )}
-    </div>
+    </>
   );
 };
 

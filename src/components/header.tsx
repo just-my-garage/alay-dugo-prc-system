@@ -11,22 +11,51 @@ import { Droplets, LogOut, UserCircle, Settings } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import useHome from "@/pages/home/home.hook";
+import { useAuth } from "@/pages/auth/auth.context";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { userProfile, getInitials, session, signOut } =
-    useHome();
+  const { session, signOut } = useAuth();
+  const [userProfile, setUserProfile] = useState<{
+    first_name: string;
+    last_name: string;
+    email: string;
+  } | null>(null);
+
+  const getInitials = () => {
+    if (!userProfile) return "U";
+    return `${userProfile.first_name?.[0] || ""}${
+      userProfile.last_name?.[0] || ""
+    }`.toUpperCase();
+  };
+
+  useEffect(() => {
+    if (session?.user.email) {
+      const fetchProfile = async () => {
+        const { data } = await supabase
+          .from("users")
+          .select("first_name, last_name, email")
+          .eq("email", session.user.email)
+          .single();
+        if (data) {
+          setUserProfile(data);
+        }
+      };
+      fetchProfile();
+    }
+  }, [session]);
 
   const isActive = (path: string) => location.pathname === path;
 
   return (
     <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Droplets className="h-8 w-8 text-primary" />
-          <span className="text-xl font-bold text-foreground">AlayDugo</span>
+        <div className="flex items-center gap-3">
+          <img src='/prc-logo.png' alt='PRC Logo' className='h-8 w-8'/>
+          <span className="text-xl font-bold pb-1 italic">Alay<span className="not-italic text-emergency">Dugo</span></span>
         </div>
         <div className="flex items-center gap-4">
           <Button
@@ -51,7 +80,9 @@ const Header = () => {
             variant="ghost"
             asChild
             className={`${
-              isActive("/inventory") ? "bg-primary text-white hover:bg-none" : ""
+              isActive("/inventory")
+                ? "bg-primary text-white hover:bg-none"
+                : ""
             }`}
           >
             <Link to="/inventory">Inventory</Link>

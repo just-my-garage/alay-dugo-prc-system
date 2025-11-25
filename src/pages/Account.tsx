@@ -31,7 +31,6 @@ const Account = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [codeSent, setCodeSent] = useState(false);
-  const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [deletePassword, setDeletePassword] = useState("");
