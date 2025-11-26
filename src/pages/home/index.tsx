@@ -123,7 +123,7 @@ const Home = () => {
                 Philippine Red Cross
               </Badge>
               <h1 className="text-4xl md:text-5xl font-bold text-blue-950 tracking-tight">
-                Dashboard of Livesavers
+                Welcome to AlayDugo
               </h1>
             </div>
           </div>
