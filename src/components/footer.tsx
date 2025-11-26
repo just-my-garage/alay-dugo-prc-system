@@ -1,5 +1,4 @@
 import {
-  Droplets,
   Clock,
   MapPin,
 } from "lucide-react";
@@ -11,7 +10,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center gap-2 mb-4">
-              <Droplets className="h-6 w-6 text-primary" />
+              <img src='/prc-logo.png' alt='PRC Logo' className='h-8 w-8' />
               <span className="font-bold text-foreground">AlayDugo</span>
             </div>
             <p className="text-sm text-muted-foreground">
