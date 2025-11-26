@@ -1,14 +1,21 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Heart } from "lucide-react";
-import heroImage from "./assets/hero-blood-donation.jpg";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
 
 import { Link } from "react-router-dom";
 import Dashboard from "./components/Dashboard";
 import useHome from "./home.hook";
-import Loading from "@/components/loading";
+import Loading from "@/components/loading"; 
+
+import heroImage1 from "./assets/1.jpg";
+import heroImage2 from "./assets/2.jpeg";
+import heroImage3 from "./assets/3.jpg";
 
 const Home = () => {
   const {
@@ -18,23 +25,44 @@ const Home = () => {
     urgentRequests,
     inventoryStatus,
     donationDrives,
+    isLoading,
   } = useHome();
 
-  return (
-    <div className="min-h-screen">
-      {/* Navigation */}
-      <Header />
+  if (isLoading) {
+    return <Loading component={false}/>;
+  }
 
+  return (
+    <>
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div
-          className="absolute inset-0 z-0"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: "cover",
-            backgroundPosition: "center",
-          }}
-        >
+        <div className="absolute inset-0 z-0">
+          <Carousel
+            opts={{
+              loop: true,
+            }}
+            plugins={[
+              Autoplay({
+                delay: 3500,
+              }),
+            ]}
+            className="w-full h-full"
+          >
+            <CarouselContent className="h-full">
+              {[heroImage1, heroImage2, heroImage3].map((image, index) => (
+                <CarouselItem key={index - 1}>
+                  <div
+                    className="h-[800px] w-full"
+                    style={{
+                      backgroundImage: `url(${image})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }}
+                  />
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+          </Carousel>
           <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
         </div>
 
@@ -43,7 +71,7 @@ const Home = () => {
             <Badge variant="emergency" className="mb-4">
               Philippine Red Cross
             </Badge>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
+            <h1 className="text-5xl md:text-6xl font-bold mb-6 text-blue-950 tracking-tight">
               AlayDugo Blood Bank Management System
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
@@ -89,10 +117,7 @@ const Home = () => {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer />
-    </div>
+    </>
   );
 };
 

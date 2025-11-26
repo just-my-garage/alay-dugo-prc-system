@@ -105,7 +105,7 @@ const Dashboard = ({
                 </div>
                 <div className="text-xs text-emergency flex items-center gap-1 mt-1">
                   <Clock className="h-3 w-3" />
-                  {urgentRequests.length} urgent
+                  Need blood urgently
                 </div>
               </div>
               <div className="p-3 bg-emergency/10 rounded-lg">

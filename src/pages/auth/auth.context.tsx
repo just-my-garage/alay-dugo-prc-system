@@ -5,6 +5,13 @@ const AuthContext = createContext(undefined);
 
 export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
   const [session, setSession] = useState(undefined);
+  const [userProfile, setUserProfile] = useState<{
+    first_name: string;
+    last_name: string;
+    email: string;
+    is_admin: boolean;
+  } | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   //-------------------- Sign up -------------------------p
   const signUpNewUser = async (email: string, password: string) => {
@@ -26,7 +33,7 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `https://appcon-a-imma-qz2.vercel.app/start/name`,
+        redirectTo: ``,
       },
     });
   };
@@ -59,13 +66,37 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
   };
 
   useEffect(() => {
+    const fetchUserProfile = async (email: string) => {
+      const { data } = await supabase
+        .from("users")
+        .select("first_name, last_name, email, is_admin")
+        .eq("email", email)
+        .single();
+      
+      if (data) {
+        setUserProfile(data);
+      }
+      setIsLoading(false);
+    };
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
+      if (session?.user?.email) {
+        fetchUserProfile(session.user.email);
+      } else {
+        setIsLoading(false);
+      }
     });
 
     const { data: listener } = supabase.auth.onAuthStateChange(
       (_event, session) => {
         setSession(session);
+        if (session?.user?.email) {
+          fetchUserProfile(session.user.email);
+        } else {
+          setUserProfile(null);
+          setIsLoading(false);
+        }
       }
     );
 
@@ -87,7 +118,7 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
 
   return (
     <AuthContext.Provider
-      value={{ signInWithGoogle, signUpNewUser, signInUser, session, signOut }}
+      value={{ signInWithGoogle, signUpNewUser, signInUser, session, signOut, userProfile, isLoading }}
     >
       {children}
     </AuthContext.Provider>

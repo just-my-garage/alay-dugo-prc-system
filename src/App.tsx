@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./pages/auth/auth.context";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/home";
 import Donors from "./pages/donor";
 import DonorLogin from "./pages/auth/login";
@@ -17,6 +18,7 @@ import ScheduleDrive from "./pages/home/components/ScheduleDrive";
 import DriveDetails from "./pages/home/components/DriveDetails";
 import NotFound from "./pages/NotFound";
 import LearnMore from "./pages/LearnMore";
+import Layout from "./pages/Layout";
 
 const queryClient = new QueryClient();
 
@@ -28,20 +30,82 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/donors" element={<Donors />} />
-          <Route path="/donor-login" element={<DonorLogin />} />
-          <Route path="/donor-register" element={<DonorRegister />} />
-          <Route path="/inventory" element={<Inventory />} />
-          <Route path="/requests" element={<Requests />} />
-          <Route path="/create-request" element={<CreateRequest />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/account" element={<Account />} />
-          <Route path="/schedule-drive" element={<ScheduleDrive />} />
-          <Route path="/drive/:driveId" element={<DriveDetails />} />
-          <Route path="/learn-more" element={<LearnMore/>}/>
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route element={<Layout />}>
+            {/* Public routes - accessible to everyone */}
+            <Route path="/" element={<Home />} />
+            <Route path="/donor-login" element={<DonorLogin />} />
+            <Route path="/donor-register" element={<DonorRegister />} />
+            <Route path="/learn-more" element={<LearnMore/>}/>
+            <Route path="*" element={<NotFound />} />
+            
+            {/* Auth required routes - accessible to authenticated users */}
+            <Route 
+              path="/requests" 
+              element={
+                <ProtectedRoute requireAuth>
+                  <Requests />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/profile" 
+              element={
+                <ProtectedRoute requireAuth>
+                  <Profile />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/account" 
+              element={
+                <ProtectedRoute requireAuth>
+                  <Account />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Admin only routes - accessible only to admin users */}
+            <Route 
+              path="/donors" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Donors />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/inventory" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <Inventory />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/schedule-drive" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <ScheduleDrive />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/drive/:driveId" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <DriveDetails />
+                </ProtectedRoute>
+              } 
+            />
+            <Route 
+              path="/create-request" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <CreateRequest />
+                </ProtectedRoute>
+              } 
+            />
+          </Route>
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

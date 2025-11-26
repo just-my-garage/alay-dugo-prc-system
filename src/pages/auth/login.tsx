@@ -28,7 +28,7 @@ const DonorLogin = () => {
     setIsLoading(false);
 
     if (res.success) {
-      navigate("/dashboard");
+      navigate("/");
     } else {
       setError(String(res.error || "Sign-in failed"));
     }
@@ -36,23 +36,6 @@ const DonorLogin = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Droplets className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">AlayDugo</span>
-          </Link>
-          <div className="flex items-center gap-4">
-            <Button variant="ghost" asChild>
-              <Link to="/">Home</Link>
-            </Button>
-            <Button variant="outline" asChild>
-              <Link to="/donor-register">Register as Donor</Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
 
       {/* Main Content */}
       <div className="grid grid-cols-1 lg:grid-cols-2 items-center lg:px-48 bg-secondary/30 py-12 ">

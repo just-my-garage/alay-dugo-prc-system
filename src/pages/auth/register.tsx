@@ -362,25 +362,6 @@ const DonorRegister = () => {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Navigation */}
-      <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <Link to="/" className="flex items-center gap-2">
-            <Droplets className="h-8 w-8 text-primary" />
-            <span className="text-xl font-bold text-foreground">AlayDugo</span>
-          </Link>
-          <div className="flex items-center gap-2 md:gap-4">
-            <Button variant="ghost" asChild className="hidden sm:flex">
-              <Link to="/">Home</Link>
-            </Button>
-            <Button variant="outline" asChild size="sm" className="md:size-default">
-              <Link to="/donor-login">
-                <span className="hidden sm:inline">Already registered? </span>Sign In
-              </Link>
-            </Button>
-          </div>
-        </div>
-      </nav>
 
       {/* Main Content */}
       <div className="flex-1 bg-secondary/30 py-8 md:py-12 px-4">

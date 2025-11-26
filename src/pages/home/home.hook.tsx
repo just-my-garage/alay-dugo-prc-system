@@ -1,7 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "../auth/auth.context";
-import { useState, useEffect } from "react";
 import { useBloodInventory } from "@/hooks/use-blood-inventory";
 import { useBloodRequests } from "@/hooks/use-blood-requests";
 
@@ -10,7 +8,7 @@ const useHome = () => {
   const { emergencyRequests, urgentRequests } = useBloodRequests();
 
   // Fetch active donors count
-  const { data: activeDonorsCount = 0 } = useQuery({
+   const { data: activeDonorsCount = 0, isLoading: isLoadingDonors } = useQuery({
     queryKey: ["active-donors-count"],
     queryFn: async () => {
       const { count, error } = await supabase
@@ -24,7 +22,7 @@ const useHome = () => {
   });
 
   // Fetch blood inventory from database
-  const { data: inventoryStatus = [] } = useQuery({
+  const { data: inventoryStatus = [], isLoading: isLoadingInventory } = useQuery({
     queryKey: ["blood-inventory"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -58,7 +56,7 @@ const useHome = () => {
     },
   });
 
-  const { data: donationDrives } = useQuery({
+  const { data: donationDrives, isLoading: isLoadingDrives } = useQuery({
     queryKey: ["donation_drives"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -72,6 +70,8 @@ const useHome = () => {
     },
   });
 
+  const isLoading = isLoadingDonors || isLoadingInventory || isLoadingDrives;
+
   return {
     totalUnits,
     emergencyRequests,
@@ -79,6 +79,7 @@ const useHome = () => {
     activeDonorsCount,
     inventoryStatus,
     donationDrives,
+    isLoading,
   };
 };
 
