@@ -7,7 +7,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Droplets, LogOut, UserCircle, Settings } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import { Droplets, LogOut, UserCircle, Settings, Menu } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -19,6 +26,7 @@ const Header = () => {
   const location = useLocation();
   const { session, signOut, userProfile } = useAuth();
   const [isOnRegister, setIsOnRegister] = useState<boolean>(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const getInitials = () => {
     if (!userProfile) return "U";
@@ -33,14 +41,22 @@ const Header = () => {
 
   const isActive = (path: string) => location.pathname === path;
 
+  const handleNavClick = () => {
+    setIsMenuOpen(false);
+  };
+
   return (
     <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <img src='/prc-logo.png' alt="AlayDugo Logo" className="h-8 w-8"/>
-          <h1 className="text-2xl font-bold text-blue-950 pb-1 tracking-tighter">Alay<span className="text-primary">Dugo</span></h1>
+          <img src='/prc-logo.png' alt="AlayDugo Logo" className="h-7 w-7 sm:h-8 sm:w-8"/>
+          <h1 className="text-xl sm:text-2xl font-bold text-blue-950 pb-1 tracking-tighter">
+            Alay<span className="text-primary">Dugo</span>
+          </h1>
         </Link>
-        <div className="flex items-center gap-4">
+
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex items-center gap-4">
           {session ? (
             <>
               <Button
@@ -158,6 +174,124 @@ const Header = () => {
                 <Link to="/donor-register">Register as Donor</Link>
               </Button>
             </>
+          )}
+        </div>
+
+        {/* Mobile Navigation */}
+        <div className="flex md:hidden items-center gap-2">
+          {session ? (
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage
+                        src=""
+                        alt={userProfile?.first_name || "User"}
+                      />
+                      <AvatarFallback>{getInitials()}</AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">
+                        {userProfile
+                          ? `${userProfile.first_name} ${userProfile.last_name}`
+                          : "Loading..."}
+                      </p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        {userProfile?.email || session.user.email}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => navigate("/profile")}>
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account")}>
+                    <Settings className="mr-2 h-4 w-4" />
+                    Account
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={signOut}>
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <Menu className="h-5 w-5" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-64">
+                  <SheetHeader>
+                    <SheetTitle>Menu</SheetTitle>
+                  </SheetHeader>
+                  <div className="flex flex-col gap-2 mt-6">
+                    <Button
+                      variant={isActive("/") ? "default" : "ghost"}
+                      asChild
+                      className="justify-start"
+                      onClick={handleNavClick}
+                    >
+                      <Link to="/">Dashboard</Link>
+                    </Button>
+                    {userProfile?.is_admin && (
+                      <>
+                        <Button
+                          variant={isActive("/donors") ? "default" : "ghost"}
+                          asChild
+                          className="justify-start"
+                          onClick={handleNavClick}
+                        >
+                          <Link to="/donors">Donors</Link>
+                        </Button>
+                        <Button
+                          variant={isActive("/inventory") ? "default" : "ghost"}
+                          asChild
+                          className="justify-start"
+                          onClick={handleNavClick}
+                        >
+                          <Link to="/inventory">Inventory</Link>
+                        </Button>
+                      </>
+                    )}
+                    <Button
+                      variant={isActive("/requests") ? "default" : "ghost"}
+                      asChild
+                      className="justify-start"
+                      onClick={handleNavClick}
+                    >
+                      <Link to="/requests">Requests</Link>
+                    </Button>
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </>
+          ) : isOnRegister ? (
+            <Button
+              variant="outline"
+              asChild
+              size="sm"
+            >
+              <Link to="/donor-login">Sign In</Link>
+            </Button>
+          ) : (
+            <Button
+              variant="outline"
+              asChild
+              size="sm"
+            >
+              <Link to="/donor-register">Register</Link>
+            </Button>
           )}
         </div>
       </div>
