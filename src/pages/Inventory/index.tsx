@@ -19,8 +19,10 @@ import {
 import { RecordNewUnit } from "./components/RecordNewUnit";
 import { useInventoryPage } from "./inventory.hook";
 import Loading from "@/components/loading";
+import { useAuth } from "../auth/auth.context";
 
 const Inventory = () => {
+  const { session, userProfile } = useAuth();
   const {
     isRecordDialogOpen,
     setIsRecordDialogOpen,

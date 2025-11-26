@@ -23,22 +23,24 @@ interface DashboardProps {
   activeDonorsCount: number;
   totalUnits: number;
   emergencyRequests: any[];
-  urgentRequests: any[];
   inventoryStatus: {
     bloodType: string;
     units: number;
     status: "good" | "medium" | "low" | "critical";
   }[];
   donationDrives: any;
+  session: any;
+  userProfile: any;
 }
 
 const Dashboard = ({
   activeDonorsCount,
   totalUnits,
   emergencyRequests,
-  urgentRequests,
   inventoryStatus,
   donationDrives,
+  session,
+  userProfile,
 }: DashboardProps) => (
   <div className="min-h-screen bg-background">
     <div className="container mx-auto px-4 py-8">
@@ -145,9 +147,11 @@ const Dashboard = ({
                 Scheduled blood donation events across the network
               </CardDescription>
             </div>
-            <Button variant="outline" size="sm" asChild>
-              <Link to="/schedule-drive">Schedule New Drive</Link>
-            </Button>
+            {session && userProfile?.is_admin && (
+              <Button variant="outline" size="sm" asChild>
+                <Link to="/schedule-drive">Schedule New Drive</Link>
+              </Button>
+            )}
           </div>
         </CardHeader>
         <CardContent>
@@ -194,9 +198,11 @@ const Dashboard = ({
                   Urgent blood requests requiring immediate attention
                 </CardDescription>
               </div>
-              <Button variant="emergency" size="sm">
-                <Link to="/requests">View All</Link>
-              </Button>
+              {session && (
+                <Button variant="emergency" size="sm">
+                  <Link to="/requests">View All</Link>
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
@@ -260,9 +266,11 @@ const Dashboard = ({
                   Current stock levels by blood type
                 </CardDescription>
               </div>
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/inventory">Manage</Link>
-              </Button>
+              {session && userProfile?.is_admin && (
+                <Button variant="outline" size="sm" asChild>
+                  <Link to="/inventory">Manage</Link>
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
