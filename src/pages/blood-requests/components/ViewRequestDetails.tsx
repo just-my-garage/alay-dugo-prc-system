@@ -57,6 +57,8 @@ interface ViewRequestDetailsProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onDelete?: (requestId: number) => void;
+  session?: any;
+  userProfile?: any;
 }
 
 const ViewRequestDetails = ({
@@ -64,6 +66,8 @@ const ViewRequestDetails = ({
   open,
   onOpenChange,
   onDelete,
+  session,
+  userProfile,
 }: ViewRequestDetailsProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
@@ -332,7 +336,7 @@ const ViewRequestDetails = ({
               </div>
             </div>
           </div>
-          {onDelete && (
+          {session && userProfile?.is_admin && onDelete && (
             <Button
               variant="destructive"
               size="sm"

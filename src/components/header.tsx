@@ -50,7 +50,7 @@ const Header = () => {
                   isActive("/") ? "bg-primary text-white hover:bg-none" : ""
                 }`}
               >
-                <Link to="/">Home</Link>
+                <Link to="/">Dashboard</Link>
               </Button>
               {userProfile?.is_admin && (
                 <>

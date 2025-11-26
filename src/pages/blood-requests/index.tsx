@@ -22,8 +22,10 @@ import Loading from "@/components/loading";
 import FulfillRequest from "./components/FulfillRequest";
 import ViewRequestDetails from "./components/ViewRequestDetails";
 import { useState } from "react";
+import { useAuth } from "../auth/auth.context";
 
 const Requests = () => {
+  const { session, userProfile } = useAuth();
   const {
     isLoading,
     allRequests,
@@ -151,64 +153,71 @@ const Requests = () => {
       </div>
 
       <div className="flex gap-2">
-        {request.status !== "Fulfilled" && (
-          <button
-            onClick={() => handleFulfillClick(request)}
-            className={`flex-1 relative overflow-hidden rounded-md border transition-all hover:scale-[1.02] ${
-              request.status === "Pending"
-                ? "border-success/20 bg-success/5 hover:bg-success/10"
-                : "border-warning/20 bg-warning/5 hover:bg-warning/10"
-            }`}
-          >
-            <div className="relative z-10 flex items-center justify-center gap-2 py-2 px-4">
-              {request.status === "Pending" ? (
-                <>
+        {session && userProfile?.is_admin && (
+          <>
+            {request.status !== "Fulfilled" && (
+              <button
+                onClick={() => handleFulfillClick(request)}
+                className={`flex-1 relative overflow-hidden rounded-md border transition-all hover:scale-[1.02] ${
+                  request.status === "Pending"
+                    ? "border-success/20 bg-success/5 hover:bg-success/10"
+                    : "border-warning/20 bg-warning/5 hover:bg-warning/10"
+                }`}
+              >
+                <div className="relative z-10 flex items-center justify-center gap-2 py-2 px-4">
+                  {request.status === "Pending" ? (
+                    <>
+                      <CheckCircle className="h-4 w-4 text-success" />
+                      <span className="font-medium text-success">
+                        Fulfill Request
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <Package className="h-4 w-4 text-warning" />
+                      <span className="font-medium text-warning">
+                        Complete Fulfillment
+                      </span>
+                    </>
+                  )}
+                </div>
+                <div
+                  className={`absolute inset-0 transition-all ${
+                    request.status === "Pending"
+                      ? "bg-success/10"
+                      : "bg-warning/10"
+                  }`}
+                  style={{
+                    width: `${
+                      (request.items.reduce(
+                        (sum: number, item: any) => sum + item.fulfilled,
+                        0
+                      ) /
+                        request.items.reduce(
+                          (sum: number, item: any) => sum + item.requested,
+                          0
+                        )) *
+                      100
+                    }%`,
+                  }}
+                />
+              </button>
+            )}
+            {request.status === "Fulfilled" && (
+              <div className="flex-1 relative overflow-hidden rounded-md border border-success/20 bg-success/10">
+                <div className="flex items-center justify-center gap-2 py-2 px-4">
                   <CheckCircle className="h-4 w-4 text-success" />
-                  <span className="font-medium text-success">
-                    Fulfill Request
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Package className="h-4 w-4 text-warning" />
-                  <span className="font-medium text-warning">
-                    Complete Fulfillment
-                  </span>
-                </>
-              )}
-            </div>
-            <div
-              className={`absolute inset-0 transition-all ${
-                request.status === "Pending" ? "bg-success/10" : "bg-warning/10"
-              }`}
-              style={{
-                width: `${
-                  (request.items.reduce(
-                    (sum: number, item: any) => sum + item.fulfilled,
-                    0
-                  ) /
-                    request.items.reduce(
-                      (sum: number, item: any) => sum + item.requested,
-                      0
-                    )) *
-                  100
-                }%`,
-              }}
-            />
-          </button>
-        )}
-        {request.status === "Fulfilled" && (
-          <div className="flex-1 relative overflow-hidden rounded-md border border-success/20 bg-success/10">
-            <div className="flex items-center justify-center gap-2 py-2 px-4">
-              <CheckCircle className="h-4 w-4 text-success" />
-              <span className="font-medium text-success">Fulfilled</span>
-            </div>
-          </div>
+                  <span className="font-medium text-success">Fulfilled</span>
+                </div>
+              </div>
+            )}
+          </>
         )}
         <Button
           variant="outline"
           size="sm"
           onClick={() => handleViewDetailsClick(request)}
+          className="w-auto"
         >
           View Details
         </Button>
@@ -217,9 +226,7 @@ const Requests = () => {
   );
 
   if (isLoading) {
-    return (
-        <Loading component={false} />
-    );
+    return <Loading component={false} />;
   }
 
   return (
@@ -237,12 +244,14 @@ const Requests = () => {
                 Manage and fulfill hospital blood requests
               </p>
             </div>
-            <Button variant="default" size="lg" asChild className="lg:mt-8">
-              <Link to="/create-request">
-                <AlertCircle className="mr-2 h-5 w-5" />
-                New Request
-              </Link>
-            </Button>
+            {session && userProfile?.is_admin && (
+              <Button variant="default" size="lg" asChild className="lg:mt-8">
+                <Link to="/create-request">
+                  <AlertCircle className="mr-2 h-5 w-5" />
+                  New Request
+                </Link> 
+              </Button>
+            )}
           </div>
 
           {/* Summary Cards */}
@@ -501,6 +510,8 @@ const Requests = () => {
           open={viewDetailsOpen}
           onOpenChange={setViewDetailsOpen}
           onDelete={(requestId) => deleteRequest.mutate(requestId)}
+          session={session}
+          userProfile={userProfile}
         />
       )}
     </>

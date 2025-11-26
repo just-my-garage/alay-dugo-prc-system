@@ -35,7 +35,7 @@ const Home = () => {
 
   return (
     <>
-      {!session && (
+      {!session ? (
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 z-0">
             <Carousel
@@ -84,6 +84,47 @@ const Home = () => {
               <Button size="lg" variant="default" asChild>
                 <Link to="/donor-register">Register as Donor</Link>
               </Button>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="relative overflow-hidden">
+          <div className="absolute inset-0 z-0">
+            <Carousel
+              opts={{
+                loop: true,
+              }}
+              plugins={[
+                Autoplay({
+                  delay: 3500,
+                }),
+              ]}
+              className="w-full h-full"
+            >
+              <CarouselContent className="h-full">
+                {[heroImage1, heroImage2, heroImage3].map((image, index) => (
+                  <CarouselItem key={index - 1}>
+                    <div
+                      className="h-[400px] w-full bg-cover bg-center"
+                      style={{
+                        backgroundImage: `url(${image})`,
+                      }}
+                    />
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+            </Carousel>
+            <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
+          </div>
+
+          <div className="container mx-auto px-4 py-16 relative z-10">
+            <div className="max-w-2xl">
+              <Badge variant="emergency" className="mb-4">
+                Philippine Red Cross
+              </Badge>
+              <h1 className="text-4xl md:text-5xl font-bold text-blue-950 tracking-tight">
+                Dashboard of Livesavers
+              </h1>
             </div>
           </div>
         </section>
