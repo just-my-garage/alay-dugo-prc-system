@@ -136,9 +136,6 @@ const Header = () => {
             </>
           ) : isOnRegister ? (
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/">Home</Link>
-              </Button>
               <Button
                 variant="outline"
                 asChild
@@ -153,9 +150,6 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Button variant="ghost" asChild>
-                <Link to="/">Home</Link>
-              </Button>
               <Button
                 variant="outline"
                 asChild
