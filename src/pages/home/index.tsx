@@ -26,6 +26,7 @@ const Home = () => {
     emergencyRequests,
     inventoryStatus,
     donationDrives,
+    fulfillmentRate,
     isLoading,
   } = useHome();
 
@@ -137,6 +138,7 @@ const Home = () => {
         emergencyRequests={emergencyRequests}
         inventoryStatus={inventoryStatus}
         donationDrives={donationDrives}
+        fulfillmentRate={fulfillmentRate}
         session={session}
         userProfile={userProfile}
       />

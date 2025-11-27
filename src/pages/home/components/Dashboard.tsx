@@ -34,6 +34,7 @@ interface DashboardProps {
     status: "good" | "medium" | "low" | "critical";
   }[];
   donationDrives: any;
+  fulfillmentRate: number;
   session: any;
   userProfile: any;
 }
@@ -44,6 +45,7 @@ const Dashboard = ({
   emergencyRequests,
   inventoryStatus,
   donationDrives,
+  fulfillmentRate,
   session,
   userProfile,
 }: DashboardProps) => {
@@ -169,10 +171,18 @@ const Dashboard = ({
                 <div className="text-sm text-muted-foreground mb-1">
                   Fulfillment Rate
                 </div>
-                <div className="text-3xl font-bold text-foreground">98.2%</div>
-                <div className="text-xs text-success flex items-center gap-1 mt-1">
+                <div className="text-3xl font-bold text-foreground">
+                  {fulfillmentRate.toFixed(1)}%
+                </div>
+                <div className={`text-xs flex items-center gap-1 mt-1 ${
+                  fulfillmentRate >= 90 ? 'text-success' : 
+                  fulfillmentRate >= 70 ? 'text-warning' : 
+                  'text-emergency'
+                }`}>
                   <TrendingUp className="h-3 w-3" />
-                  Above target
+                  {fulfillmentRate >= 90 ? 'Above target' : 
+                   fulfillmentRate >= 70 ? 'Near target' : 
+                   'Below target'}
                 </div>
               </div>
               <div className="p-3 bg-accent/10 rounded-lg">

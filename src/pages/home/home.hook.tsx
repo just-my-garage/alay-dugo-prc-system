@@ -5,7 +5,27 @@ import { useBloodRequests } from "@/hooks/use-blood-requests";
 
 const useHome = () => {
   const { totalUnits } = useBloodInventory();
-  const { emergencyRequests, urgentRequests } = useBloodRequests();
+  const { emergencyRequests, urgentRequests, allRequests } = useBloodRequests();
+
+  // Calculate fulfillment rate based on all blood requests
+  const calculateFulfillmentRate = () => {
+    if (!allRequests || allRequests.length === 0) return 0;
+
+    let totalRequested = 0;
+    let totalFulfilled = 0;
+
+    allRequests.forEach((request: any) => {
+      request.items.forEach((item: any) => {
+        totalRequested += item.requested;
+        totalFulfilled += item.fulfilled;
+      });
+    });
+
+    if (totalRequested === 0) return 0;
+    return (totalFulfilled / totalRequested) * 100;
+  };
+
+  const fulfillmentRate = calculateFulfillmentRate();
 
   // Fetch active donors count
    const { data: activeDonorsCount = 0, isLoading: isLoadingDonors } = useQuery({
@@ -78,6 +98,7 @@ const useHome = () => {
     activeDonorsCount,
     inventoryStatus,
     donationDrives,
+    fulfillmentRate,
     isLoading,
   };
 };
