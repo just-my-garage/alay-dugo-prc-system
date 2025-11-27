@@ -21,8 +21,11 @@ import useBloodRequestsPage from "./requests.hook";
 import Loading from "@/components/loading";
 import FulfillRequest from "./components/FulfillRequest";
 import ViewRequestDetails from "./components/ViewRequestDetails";
+import UpdateRequest from "./components/UpdateRequest";
 import { useState } from "react";
 import { useAuth } from "../auth/auth.context";
+import { Edit, BookmarkPlus, BookmarkMinus } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Requests = () => {
   const { session, userProfile } = useAuth();
@@ -34,6 +37,11 @@ const Requests = () => {
     urgentRequests,
     routineRequests,
     fulfilledRequests,
+    myRequests,
+    myPendingRequests,
+    trackRequest,
+    untrackRequest,
+    getTrackedRequests,
     refetch,
     deleteRequest,
   } = useBloodRequestsPage();
@@ -42,7 +50,9 @@ const Requests = () => {
   const [selectedRequest, setSelectedRequest] = useState<any>(null);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
   const [viewDetailsRequest, setViewDetailsRequest] = useState<any>(null);
-  const [activeTab, setActiveTab] = useState("all");
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
+  const [updateRequestId, setUpdateRequestId] = useState<number | null>(null);
+  const [activeTab, setActiveTab] = useState(session && userProfile?.is_admin ? "myRequests" : "emergency");
 
   const handleFulfillClick = (request: any) => {
     setSelectedRequest(request);
@@ -53,6 +63,31 @@ const Requests = () => {
     setViewDetailsRequest(request);
     setViewDetailsOpen(true);
   };
+
+  const handleUpdateClick = (requestId: number) => {
+    setUpdateRequestId(requestId);
+    setUpdateDialogOpen(true);
+  };
+
+  const handleTrackRequest = (requestId: number) => {
+    trackRequest(requestId);
+    toast({
+      title: "Success",
+      description: "Request tracked successfully",
+    });
+    refetch();
+  };
+
+  const handleUntrackRequest = (requestId: number) => {
+    untrackRequest(requestId);
+    toast({
+      title: "Success",
+      description: "Request untracked successfully",
+    });
+    refetch();
+  };
+
+  const isTracked = (requestId: number) => getTrackedRequests().includes(requestId);
 
   // Process data from API
 
@@ -211,6 +246,38 @@ const Requests = () => {
                 </div>
               </div>
             )}
+            {isTracked(request.id) && request.status !== "Fulfilled" && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleUpdateClick(request.id)}
+                className="w-full sm:w-auto"
+              >
+                <Edit className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            )}
+            {!isTracked(request.id) ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleTrackRequest(request.id)}
+                className="w-full sm:w-auto"
+              >
+                <BookmarkPlus className="h-4 w-4 mr-2" />
+                Track
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => handleUntrackRequest(request.id)}
+                className="w-full sm:w-auto"
+              >
+                <BookmarkMinus className="h-4 w-4 mr-2" />
+                Untrack
+              </Button>
+            )}
           </>
         )}
         <Button
@@ -337,9 +404,15 @@ const Requests = () => {
         <div className="col-span-1 lg:col-span-2">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="grid w-full grid-cols-5 mb-4 sm:mb-6 h-auto overflow-x-auto">
-              <TabsTrigger value="all" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">
-                All ({pendingRequests.length})
-              </TabsTrigger>
+              {session && userProfile?.is_admin ? (
+                <TabsTrigger value="myRequests" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">
+                  My Requests ({myPendingRequests.length})
+                </TabsTrigger>
+              ) : (
+                <TabsTrigger value="all" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">
+                  All ({pendingRequests.length})
+                </TabsTrigger>
+              )}
               <TabsTrigger
                 value="emergency"
                 className="data-[state=active]:text-emergency text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
@@ -363,29 +436,56 @@ const Requests = () => {
               </TabsTrigger>
             </TabsList>
 
-            <TabsContent value="all">
-              <Card>
-                <CardHeader className="px-4 sm:px-6">
-                  <CardTitle className="text-lg sm:text-xl">All Pending Requests</CardTitle>
-                  <CardDescription className="text-xs sm:text-sm">
-                    View all pending blood requests across all priority levels
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="px-4 sm:px-6">
-                  {pendingRequests.length > 0 ? (
-                    <div className="space-y-3 sm:space-y-4">
-                      {pendingRequests.map((request) => (
-                        <RequestCard key={request.id} request={request} />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8 text-sm sm:text-base text-muted-foreground">
-                      No pending requests found
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+            {session && userProfile?.is_admin ? (
+              <TabsContent value="myRequests">
+                <Card>
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl">My Tracked Requests</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      View and manage your tracked blood requests
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 sm:px-6">
+                    {myPendingRequests.length > 0 ? (
+                      <div className="space-y-3 sm:space-y-4">
+                        {myPendingRequests.map((request) => (
+                          <RequestCard key={request.id} request={request} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-sm sm:text-base text-muted-foreground">
+                        <p>No tracked requests found</p>
+                        <p className="text-xs mt-2">Click "Track" on any request to add it here</p>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            ) : (
+              <TabsContent value="all">
+                <Card>
+                  <CardHeader className="px-4 sm:px-6">
+                    <CardTitle className="text-lg sm:text-xl">All Pending Requests</CardTitle>
+                    <CardDescription className="text-xs sm:text-sm">
+                      View all pending blood requests across all priority levels
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="px-4 sm:px-6">
+                    {pendingRequests.length > 0 ? (
+                      <div className="space-y-3 sm:space-y-4">
+                        {pendingRequests.map((request) => (
+                          <RequestCard key={request.id} request={request} />
+                        ))}
+                      </div>
+                    ) : (
+                      <div className="text-center py-8 text-sm sm:text-base text-muted-foreground">
+                        No pending requests found
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            )}
 
             <TabsContent value="emergency">
               <Card className="border-emergency/20">
@@ -514,6 +614,19 @@ const Requests = () => {
           onDelete={(requestId) => deleteRequest.mutate(requestId)}
           session={session}
           userProfile={userProfile}
+        />
+      )}
+
+      {/* Update Request Dialog */}
+      {updateRequestId && (
+        <UpdateRequest
+          requestId={updateRequestId}
+          open={updateDialogOpen}
+          onOpenChange={setUpdateDialogOpen}
+          onSuccess={() => {
+            refetch();
+            setUpdateDialogOpen(false);
+          }}
         />
       )}
     </>

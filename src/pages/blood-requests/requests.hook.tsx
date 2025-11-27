@@ -20,6 +20,34 @@ const useBloodRequestsPage = () => {
     isLoading: isLoadingRequests,
   } = useBloodRequests();
 
+  // Track admin's own requests in localStorage
+  const getTrackedRequests = (): number[] => {
+    const tracked = localStorage.getItem("admin_tracked_requests");
+    return tracked ? JSON.parse(tracked) : [];
+  };
+
+  const trackRequest = (requestId: number) => {
+    const tracked = getTrackedRequests();
+    if (!tracked.includes(requestId)) {
+      localStorage.setItem("admin_tracked_requests", JSON.stringify([...tracked, requestId]));
+    }
+  };
+
+  const untrackRequest = (requestId: number) => {
+    const tracked = getTrackedRequests();
+    localStorage.setItem(
+      "admin_tracked_requests",
+      JSON.stringify(tracked.filter((id) => id !== requestId))
+    );
+  };
+
+  // Filter requests that are tracked by the admin
+  const myRequests = allRequests.filter((req: any) => 
+    getTrackedRequests().includes(req.id)
+  );
+
+  const myPendingRequests = myRequests.filter((req: any) => req.status !== "Fulfilled");
+
   const deleteRequest = useMutation({
     mutationFn: async (requestId: number) => {
       // First delete blood_request_items (if they have foreign key constraints)
@@ -66,6 +94,11 @@ const useBloodRequestsPage = () => {
     urgentRequests,
     routineRequests,
     fulfilledRequests,
+    myRequests,
+    myPendingRequests,
+    trackRequest,
+    untrackRequest,
+    getTrackedRequests,
     refetch: () => queryClient.invalidateQueries({ queryKey: ["blood-requests"] }),
     deleteRequest,
   };
