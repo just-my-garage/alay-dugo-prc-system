@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/pages/auth/auth.context";
 
 const bloodTypes = ["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"];
 const urgencyLevels = ["Emergency", "Urgent", "Routine"];
@@ -47,6 +48,7 @@ interface ProductType {
 
 const CreateRequest = () => {
   const navigate = useNavigate();
+  const { session, userProfile } = useAuth();
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [productTypes, setProductTypes] = useState<ProductType[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -136,6 +138,18 @@ const CreateRequest = () => {
         .insert(itemsToInsert);
 
       if (itemsError) throw itemsError;
+
+      // Auto-track the request for the current admin user
+      if (session && userProfile?.is_admin && requestData.request_id) {
+        const tracked = localStorage.getItem("admin_tracked_requests");
+        const trackedRequests = tracked ? JSON.parse(tracked) : [];
+        if (!trackedRequests.includes(requestData.request_id)) {
+          localStorage.setItem(
+            "admin_tracked_requests",
+            JSON.stringify([...trackedRequests, requestData.request_id])
+          );
+        }
+      }
 
       toast({
         title: "Success",
