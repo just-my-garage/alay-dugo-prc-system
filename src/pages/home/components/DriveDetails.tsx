@@ -1,18 +1,24 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Calendar, MapPin, Clock, Building2, Users, Droplets } from "lucide-react";
+import { ArrowLeft, Calendar, MapPin, Clock, Building2, Users, Droplets, CalendarCheck } from "lucide-react";
 import Loading from "@/components/loading";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
+import { useAuth } from "@/pages/auth/auth.context";
+import { toast } from "sonner";
 
 const DriveDetails = () => {
   const { driveId } = useParams<{ driveId: string }>();
   const navigate = useNavigate();
   const driveIdNum = driveId ? Number(driveId) : null;
+  const { session, userProfile } = useAuth();
+  const queryClient = useQueryClient();
+  
+  const isDonor = session && !userProfile?.is_admin;
 
   // Fetch donation drive details
   const { data: drive, isLoading: isDriveLoading } = useQuery({
@@ -56,6 +62,79 @@ const DriveDetails = () => {
       return data;
     },
     enabled: !!driveIdNum,
+  });
+
+  // Check if current donor has scheduled for this drive
+  const { data: userDonation } = useQuery({
+    queryKey: ["user_drive_donation", driveIdNum, userProfile?.donor_id],
+    queryFn: async () => {
+      if (!userProfile?.donor_id || !driveIdNum) return null;
+      
+      const { data, error } = await supabase
+        .from("donations")
+        .select("*")
+        .eq("drive_id", driveIdNum)
+        .eq("donor_id", userProfile.donor_id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!driveIdNum && !!userProfile?.donor_id && isDonor,
+  });
+
+  // Schedule donation mutation
+  const scheduleDonation = useMutation({
+    mutationFn: async () => {
+      if (!userProfile?.donor_id || !driveIdNum) {
+        throw new Error("Missing required information");
+      }
+
+      const { error } = await supabase
+        .from("donations")
+        .insert({
+          donor_id: userProfile.donor_id,
+          drive_id: driveIdNum,
+          donation_date: drive?.start_datetime.split('T')[0] || new Date().toISOString().split('T')[0],
+          donation_location_type: "Drive",
+          screening_result: "Passed",
+          notes: "Scheduled donation"
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user_drive_donation", driveIdNum, userProfile?.donor_id] });
+      queryClient.invalidateQueries({ queryKey: ["drive_donations", driveIdNum] });
+      toast.success("Donation scheduled successfully!");
+    },
+    onError: (error) => {
+      toast.error("Failed to schedule donation: " + error.message);
+    }
+  });
+
+  // Cancel donation mutation
+  const cancelDonation = useMutation({
+    mutationFn: async () => {
+      if (!userDonation?.donation_id) {
+        throw new Error("No donation to cancel");
+      }
+
+      const { error } = await supabase
+        .from("donations")
+        .delete()
+        .eq("donation_id", userDonation.donation_id);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["user_drive_donation", driveIdNum, userProfile?.donor_id] });
+      queryClient.invalidateQueries({ queryKey: ["drive_donations", driveIdNum] });
+      toast.success("Donation cancelled successfully!");
+    },
+    onError: (error) => {
+      toast.error("Failed to cancel donation: " + error.message);
+    }
   });
 
   if (isDriveLoading || isDonationsLoading) {
@@ -224,6 +303,82 @@ const DriveDetails = () => {
             </div>
           </CardContent>
         </Card>
+
+        {/* Donor Scheduling Section */}
+        {isDonor && (isUpcoming || isOngoing) && drive.status !== "Cancelled" && (
+          <Card className="mb-6 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <CalendarCheck className="h-5 w-5 text-primary" />
+                Donation Scheduling
+              </CardTitle>
+              <CardDescription>
+                {userDonation 
+                  ? "You're scheduled for this donation drive"
+                  : "Schedule your donation for this drive"
+                }
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {userDonation ? (
+                <div className="space-y-4">
+                  <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
+                    <div className="flex items-center gap-3 mb-2">
+                      <CalendarCheck className="h-5 w-5 text-success" />
+                      <span className="font-semibold text-success">Scheduled</span>
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      You're scheduled to donate on {new Date(userDonation.donation_date).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric"
+                      })}
+                    </p>
+                    {userDonation.notes && (
+                      <p className="text-sm text-muted-foreground mt-2">
+                        Note: {userDonation.notes}
+                      </p>
+                    )}
+                  </div>
+                  <Button
+                    variant="destructive"
+                    onClick={() => cancelDonation.mutate()}
+                    disabled={cancelDonation.isPending}
+                  >
+                    {cancelDonation.isPending ? "Cancelling..." : "Cancel Donation"}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="p-4 bg-muted rounded-lg">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Join this donation drive and help save lives!
+                    </p>
+                    <div className="flex items-center gap-2 text-sm">
+                      <Calendar className="h-4 w-4 text-primary" />
+                      <span className="font-medium">
+                        Scheduled Date: {startDate.toLocaleDateString("en-US", {
+                          weekday: "long",
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric"
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                  <Button
+                    onClick={() => scheduleDonation.mutate()}
+                    disabled={scheduleDonation.isPending}
+                    className="w-full sm:w-auto"
+                  >
+                    {scheduleDonation.isPending ? "Scheduling..." : "Schedule My Donation"}
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Statistics */}
         <div className="grid md:grid-cols-3 gap-6 mb-6">
