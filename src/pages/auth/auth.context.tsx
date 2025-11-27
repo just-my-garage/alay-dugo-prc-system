@@ -69,7 +69,7 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
     const fetchUserProfile = async (email: string) => {
       const { data } = await supabase
         .from("users")
-        .select("first_name, last_name, email, is_admin")
+        .select("donor_id, first_name, last_name, email, is_admin")
         .eq("email", email)
         .single();
       

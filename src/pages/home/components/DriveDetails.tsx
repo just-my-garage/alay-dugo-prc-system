@@ -1,4 +1,4 @@
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,8 @@ import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { useAuth } from "@/pages/auth/auth.context";
 import { toast } from "sonner";
+import { useState } from "react";
+import ScheduleDonationModal from "./ScheduleDonationModal";
 
 const DriveDetails = () => {
   const { driveId } = useParams<{ driveId: string }>();
@@ -17,6 +19,7 @@ const DriveDetails = () => {
   const driveIdNum = driveId ? Number(driveId) : null;
   const { session, userProfile } = useAuth();
   const queryClient = useQueryClient();
+  const [modalOpen, setModalOpen] = useState(false);
   
   const isDonor = session && !userProfile?.is_admin;
 
@@ -305,7 +308,7 @@ const DriveDetails = () => {
         </Card>
 
         {/* Donor Scheduling Section */}
-        {isDonor && (isUpcoming || isOngoing) && drive.status !== "Cancelled" && (
+        {(isUpcoming || isOngoing) && drive.status !== "Cancelled" && (
           <Card className="mb-6 border-primary/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -313,72 +316,43 @@ const DriveDetails = () => {
                 Donation Scheduling
               </CardTitle>
               <CardDescription>
-                {userDonation 
+                {!session 
+                  ? "Login to schedule your donation for this drive"
+                  : userProfile?.is_admin
+                  ? "Admin accounts cannot schedule donations"
+                  : userDonation 
                   ? "You're scheduled for this donation drive"
                   : "Schedule your donation for this drive"
                 }
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {userDonation ? (
-                <div className="space-y-4">
-                  <div className="p-4 bg-success/10 border border-success/20 rounded-lg">
-                    <div className="flex items-center gap-3 mb-2">
-                      <CalendarCheck className="h-5 w-5 text-success" />
-                      <span className="font-semibold text-success">Scheduled</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground">
-                      You're scheduled to donate on {new Date(userDonation.donation_date).toLocaleDateString("en-US", {
-                        weekday: "long",
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric"
-                      })}
-                    </p>
-                    {userDonation.notes && (
-                      <p className="text-sm text-muted-foreground mt-2">
-                        Note: {userDonation.notes}
-                      </p>
-                    )}
-                  </div>
-                  <Button
-                    variant="destructive"
-                    onClick={() => cancelDonation.mutate()}
-                    disabled={cancelDonation.isPending}
-                  >
-                    {cancelDonation.isPending ? "Cancelling..." : "Cancel Donation"}
-                  </Button>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="p-4 bg-muted rounded-lg">
-                    <p className="text-sm text-muted-foreground mb-2">
-                      Join this donation drive and help save lives!
-                    </p>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="h-4 w-4 text-primary" />
-                      <span className="font-medium">
-                        Scheduled Date: {startDate.toLocaleDateString("en-US", {
-                          weekday: "long",
-                          month: "long",
-                          day: "numeric",
-                          year: "numeric"
-                        })}
-                      </span>
-                    </div>
-                  </div>
-                  <Button
-                    onClick={() => scheduleDonation.mutate()}
-                    disabled={scheduleDonation.isPending}
-                    className="w-full sm:w-auto"
-                  >
-                    {scheduleDonation.isPending ? "Scheduling..." : "Schedule My Donation"}
-                  </Button>
-                </div>
-              )}
+              <Button
+                onClick={() => setModalOpen(true)}
+                size="lg"
+                className="w-full sm:w-auto"
+                variant={userDonation ? "outline" : "default"}
+              >
+                <CalendarCheck className="h-5 w-5 mr-2" />
+                {userDonation ? "View Donation Details" : "Schedule Donation"}
+              </Button>
             </CardContent>
           </Card>
         )}
+
+        {/* Schedule Donation Modal */}
+        <ScheduleDonationModal
+          open={modalOpen}
+          onOpenChange={setModalOpen}
+          drive={drive}
+          session={session}
+          userProfile={userProfile}
+          userDonation={userDonation}
+          onSuccess={() => {
+            queryClient.invalidateQueries({ queryKey: ["user_drive_donation", driveIdNum, userProfile?.donor_id] });
+            queryClient.invalidateQueries({ queryKey: ["drive_donations", driveIdNum] });
+          }}
+        />
 
         {/* Statistics */}
         <div className="grid md:grid-cols-3 gap-6 mb-6">

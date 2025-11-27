@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthContextProvider } from "./pages/auth/auth.context";
+import ScrollToTop from "./components/scroll-to-top";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Home from "./pages/home";
 import Donors from "./pages/donor";
@@ -29,6 +30,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
+          <ScrollToTop />
           <Routes>
             <Route element={<Layout />}>
               {/* Public routes - accessible to everyone */}
@@ -65,11 +67,7 @@ const App = () => (
               />
               <Route
                 path="/drive/:driveId"
-                element={
-                  <ProtectedRoute requireAuth>
-                    <DriveDetails />
-                  </ProtectedRoute>
-                }
+                element={<DriveDetails />}
               />
 
               {/* Admin only routes - accessible only to admin users */}

@@ -63,7 +63,6 @@ const useHome = () => {
         .from("donation_drives")
         .select("*")
         .order("start_datetime", { ascending: false })
-        .limit(5);
 
       if (error) throw error;
       return data;
