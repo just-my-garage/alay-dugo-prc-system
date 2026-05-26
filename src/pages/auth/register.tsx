@@ -89,8 +89,8 @@ const DonorRegister = () => {
   }
 
   const renderStepIndicator = () => (
-    <div className="flex items-center justify-center mb-6 md:mb-8">
-      <div className="flex items-center space-x-2 sm:space-x-4">
+    <div className="flex items-center justify-center mb-5 sm:mb-6 md:mb-8 overflow-x-auto pb-1">
+      <div className="flex items-center space-x-1.5 sm:space-x-4 min-w-max px-1">
         {[1, 2, 3, 4].map((step) => (
           <div key={step} className="flex items-center">
             <div
@@ -108,7 +108,7 @@ const DonorRegister = () => {
             </div>
             {step < 4 && (
               <div
-                className={`w-8 sm:w-16 h-0.5 mx-1 sm:mx-2 ${
+                className={`w-5 sm:w-16 h-0.5 mx-1 sm:mx-2 ${
                   currentStep > step ? "bg-primary" : "bg-muted-foreground/30"
                 }`}
               />
@@ -364,39 +364,39 @@ const DonorRegister = () => {
     <div className="min-h-screen flex flex-col">
 
       {/* Main Content */}
-      <div className="flex-1 bg-secondary/30 py-8 md:py-12 px-4">
-        <div className="container mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="flex-1 bg-secondary/30 py-4 sm:py-6 md:py-10 px-0">
+        <div className="mx-auto w-full max-w-6xl px-0 sm:px-2 md:px-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 items-start lg:items-center">
             {/* Hero Text */}
-            <div className="text-center lg:text-left">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-                <Heart className="h-8 w-8 text-primary" />
+            <div className="text-center lg:text-left px-4 sm:px-0">
+              <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-primary/10 mb-3 sm:mb-4">
+                <Heart className="h-7 w-7 sm:h-8 sm:w-8 text-primary" />
               </div>
-              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-foreground mb-2 leading-tight">
                 Become a Lifesaving Hero
               </h1>
-              <p className="text-sm md:text-base text-muted-foreground">
+              <p className="text-sm md:text-base text-muted-foreground max-w-md mx-auto lg:mx-0">
                 Register as a blood donor and help save lives in the Philippines
               </p>
             </div>
-            <div className="w-full">
+            <div className="w-full px-0 sm:px-2 lg:px-0">
               {/* Registration Card */}
-              <Card className="shadow-lg">
-                <CardHeader className="space-y-1 pb-4">
-                  <CardTitle className="text-xl md:text-2xl">
+              <Card className="shadow-lg rounded-none sm:rounded-xl border-x-0 sm:border-x">
+                <CardHeader className="space-y-1 pb-3 px-4 sm:px-6">
+                  <CardTitle className="text-lg sm:text-xl md:text-2xl leading-tight">
                     {currentStep === 1 && "Personal Information"}
                     {currentStep === 2 && "Contact Information"}
                     {currentStep === 3 && "Address Details"}
                     {currentStep === 4 && "Set Your Password"}
                   </CardTitle>
-                  <CardDescription className="text-sm">
+                  <CardDescription className="text-xs sm:text-sm">
                     {currentStep === 1 && "Let's start with your basic information"}
                     {currentStep === 2 && "How can we reach you?"}
                     {currentStep === 3 && "Where are you located?"}
                     {currentStep === 4 && "Create a secure password for your account"}
                   </CardDescription>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="px-4 pb-5 sm:px-6 sm:pb-6">
                   {renderStepIndicator()}
 
                   <form onSubmit={handleSubmit} className="space-y-6">
@@ -412,13 +412,13 @@ const DonorRegister = () => {
                     {currentStep === 3 && renderStep3()}
                     {currentStep === 4 && renderStep4()}
 
-                    <div className="flex gap-3 md:gap-4 pt-4">
+                    <div className="flex flex-col-reverse sm:flex-row gap-3 md:gap-4 pt-2 sm:pt-4">
                       {currentStep > 1 && (
                         <Button
                           type="button"
                           variant="outline"
                           onClick={handleBack}
-                          className="flex-1"
+                          className="w-full sm:flex-1"
                           size="default"
                         >
                           Back
@@ -429,7 +429,7 @@ const DonorRegister = () => {
                         <Button
                           type="button"
                           onClick={handleNext}
-                          className="flex-1"
+                          className="w-full sm:flex-1"
                           size="default"
                         >
                           Next
@@ -437,7 +437,7 @@ const DonorRegister = () => {
                       ) : (
                         <Button
                           type="submit"
-                          className="flex-1"
+                          className="w-full sm:flex-1"
                           disabled={isLoading}
                           size="default"
                         >
@@ -451,7 +451,7 @@ const DonorRegister = () => {
               </Card>
 
               {/* Additional Info */}
-              <div className="mt-6 text-center">
+              <div className="mt-5 px-4 sm:px-0 text-center">
                 <p className="text-sm text-muted-foreground">
                   Already have an account?{" "}
                   <Link
@@ -467,14 +467,6 @@ const DonorRegister = () => {
         </div>
       </div>
 
-      {/* Footer */}
-      <footer className="border-t bg-card py-6">
-        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>
-            &copy; 2025 AlayDugo - Philippine Red Cross. All rights reserved.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 };

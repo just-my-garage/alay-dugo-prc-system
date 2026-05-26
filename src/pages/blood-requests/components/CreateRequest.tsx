@@ -172,10 +172,10 @@ const CreateRequest = () => {
   return (
     <>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-2 text-foreground">Create Blood Request</h1>
-          <p className="text-muted-foreground">Submit a new blood request for hospital needs</p>
+          <h1 className="text-2xl sm:text-4xl font-bold mb-2 text-foreground">Create Blood Request</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Submit a new blood request for hospital needs</p>
         </div>
 
         <Card>
@@ -276,7 +276,7 @@ const CreateRequest = () => {
                   {fields.map((field, index) => (
                     <Card key={field.id} className="border-2">
                       <CardContent className="pt-6">
-                        <div className="grid md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                           <FormField
                             control={form.control}
                             name={`items.${index}.blood_type`}
@@ -360,11 +360,16 @@ const CreateRequest = () => {
                 </div>
 
                 {/* Submit Button */}
-                <div className="flex justify-end gap-4">
-                  <Button type="button" variant="outline" onClick={() => navigate("/requests")}>
+                <div className="flex flex-col sm:flex-row justify-end gap-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => navigate("/requests")}
+                    className="w-full sm:w-auto"
+                  >
                     Cancel
                   </Button>
-                  <Button type="submit" disabled={isSubmitting}>
+                  <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
                     {isSubmitting ? "Creating..." : "Create Request"}
                   </Button>
                 </div>

@@ -225,7 +225,7 @@ const UpdateRequest = ({ open, onOpenChange, requestId, onSuccess }: UpdateReque
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Update Blood Request</DialogTitle>
           <DialogDescription>Modify the details of your blood request</DialogDescription>
@@ -328,7 +328,7 @@ const UpdateRequest = ({ open, onOpenChange, requestId, onSuccess }: UpdateReque
                 {fields.map((field, index) => (
                   <Card key={field.id} className="border-2">
                     <CardContent className="pt-6">
-                      <div className="grid md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         <FormField
                           control={form.control}
                           name={`items.${index}.blood_type`}
@@ -412,11 +412,16 @@ const UpdateRequest = ({ open, onOpenChange, requestId, onSuccess }: UpdateReque
               </div>
 
               {/* Submit Button */}
-              <div className="flex justify-end gap-4">
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+              <div className="flex flex-col sm:flex-row justify-end gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                  className="w-full sm:w-auto"
+                >
                   Cancel
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button type="submit" disabled={isSubmitting} className="w-full sm:w-auto">
                   {isSubmitting ? "Updating..." : "Update Request"}
                 </Button>
               </div>

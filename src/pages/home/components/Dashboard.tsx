@@ -99,7 +99,7 @@ const Dashboard = ({
       </div>
 
       {/* Key Metrics */}
-      <div className="grid md:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
         <Card>
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
@@ -198,7 +198,7 @@ const Dashboard = ({
         <Card className="mb-8 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
           <CardContent className="py-8">
             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex items-center gap-4">
+              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
                 <div className="p-4 bg-primary rounded-full">
                   <CalendarPlus className="h-8 w-8 text-primary-foreground" />
                 </div>
@@ -228,7 +228,7 @@ const Dashboard = ({
 
       <Card id="donation-drives-section">
         <CardHeader>
-          <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
             <div>
               <CardTitle>Donation Drives</CardTitle>
               <CardDescription>
@@ -252,7 +252,7 @@ const Dashboard = ({
             />
           </div>
           <Tabs value={statusFilter} onValueChange={setStatusFilter} className="mt-4">
-            <TabsList className="grid grid-cols-5 w-full">
+            <TabsList className="flex w-full gap-2 overflow-x-auto">
               <TabsTrigger value="Ongoing">Ongoing</TabsTrigger>
               <TabsTrigger value="Upcoming">Upcoming</TabsTrigger>
               <TabsTrigger value="Past">Past</TabsTrigger>
@@ -263,7 +263,7 @@ const Dashboard = ({
         </CardHeader>
         <CardContent>
           {filteredDrives.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {filteredDrives.map((drive: any) => {
               const startDate = new Date(drive.start_datetime);
               const endDate = new Date(drive.end_datetime);
@@ -330,11 +330,11 @@ const Dashboard = ({
         </CardContent>
       </Card>
 
-      <div className="grid lg:grid-cols-2 gap-6 my-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
         {/* Emergency Requests */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <CardTitle>All Emergency Requests</CardTitle>
                 <CardDescription>
@@ -364,7 +364,7 @@ const Dashboard = ({
                         <div className="font-semibold text-foreground">
                           {request.hospital}
                         </div>
-                        <div className="text-sm text-muted-foreground flex items-wrap gap-2">
+                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2">
                           {request.items
                             .slice(0, 2)
                             .map((item: any, idx: number) => (
@@ -402,7 +402,7 @@ const Dashboard = ({
         {/* Inventory Status */}
         <Card>
           <CardHeader>
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <CardTitle>Current Blood Inventory</CardTitle>
                 <CardDescription>
@@ -417,7 +417,7 @@ const Dashboard = ({
             </div>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               {inventoryStatus.map((item) => (
                 <div key={item.bloodType} className="p-4 border rounded-lg">
                   <div className="flex items-center justify-between mb-2">

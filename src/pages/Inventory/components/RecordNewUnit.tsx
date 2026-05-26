@@ -147,7 +147,7 @@ export const RecordNewUnit = ({ open, onOpenChange }: RecordNewUnitProps) => {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Record New Blood Unit</DialogTitle>
           <DialogDescription>
@@ -156,7 +156,7 @@ export const RecordNewUnit = ({ open, onOpenChange }: RecordNewUnitProps) => {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="unit_id">Unit ID *</Label>
               <Input
@@ -285,16 +285,17 @@ export const RecordNewUnit = ({ open, onOpenChange }: RecordNewUnitProps) => {
             </div>
           </div>
 
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4">
             <Button
               type="button"
               variant="outline"
               onClick={() => onOpenChange(false)}
               disabled={createUnitMutation.isPending}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={createUnitMutation.isPending}>
+            <Button type="submit" disabled={createUnitMutation.isPending} className="w-full sm:w-auto">
               {createUnitMutation.isPending && (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               )}

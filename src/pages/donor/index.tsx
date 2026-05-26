@@ -46,9 +46,9 @@ const Donors = () => {
   return (
     <>
       <div className="container mx-auto px-4 py-8 mb-8">
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2 text-foreground">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-2 text-foreground">
               Donor Management
             </h1>
             <p className="text-muted-foreground">
@@ -59,6 +59,7 @@ const Donors = () => {
             variant="default"
             size="lg"
             onClick={() => setShowRegistration(!showRegistration)}
+            className="w-full sm:w-auto"
           >
             <UserPlus className="mr-2 h-5 w-5" />
             Register New Donor
@@ -73,7 +74,7 @@ const Donors = () => {
         {/* Search */}
         <Card className="mb-8">
           <CardContent className="pt-6">
-            <div className="flex gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
@@ -104,7 +105,7 @@ const Donors = () => {
             {isLoading ? (
               <Loading component={true} />
             ) : (
-              <div className="lg:grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {fetch.data?.map((donor: any) => {
                   const formatDate = (dateString: string) => {
                     if (!dateString) return "N/A";
@@ -124,9 +125,9 @@ const Donors = () => {
                   return (
                     <div
                       key={donor.donor_id}
-                      className="p-6 border rounded-xl hover:shadow-lg transition-all duration-200 bg-card"
+                      className="p-4 sm:p-6 border rounded-xl hover:shadow-lg transition-all duration-200 bg-card"
                     >
-                      <div className="flex items-start justify-between gap-6">
+                      <div className="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-6">
                         {/* Left Section - Main Info */}
                         <div className="flex items-start gap-4 flex-1">
                           <div className="p-4 bg-primary/10 rounded-xl">
@@ -135,7 +136,7 @@ const Donors = () => {
                           <div className="space-y-3 flex-1">
                             {/* Name and Blood Type */}
                             <div>
-                              <div className="font-bold text-xl text-foreground mb-2">
+                            <div className="font-bold text-lg sm:text-xl text-foreground mb-2">
                                 {donor.first_name} {donor.last_name}
                               </div>
                               <div className="flex items-center gap-2 flex-wrap">
@@ -224,7 +225,7 @@ const Donors = () => {
               >
                 Previous
               </Button>
-              <div className="flex gap-1">
+              <div className="flex gap-1 flex-wrap justify-center">
                 {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => {
                   let pageNum: number;
                   if (totalPages <= 5) {

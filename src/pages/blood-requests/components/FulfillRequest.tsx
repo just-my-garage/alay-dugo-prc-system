@@ -161,11 +161,12 @@ const FulfillRequest = ({
           </div>
         </div>
 
-        <DialogFooter>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
           <Button
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={isSubmitting}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -173,6 +174,7 @@ const FulfillRequest = ({
             variant="success"
             onClick={handleFulfill}
             disabled={isSubmitting}
+            className="w-full sm:w-auto"
           >
             {isSubmitting ? "Processing..." : "Fulfill Request"}
           </Button>

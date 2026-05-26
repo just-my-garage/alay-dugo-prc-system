@@ -68,15 +68,15 @@ const Home = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
           </div>
 
-          <div className="container mx-auto px-4 py-24 relative z-10">
+          <div className="container mx-auto px-4 py-16 sm:py-24 relative z-10">
             <div className="max-w-2xl">
               <Badge variant="emergency" className="mb-4">
                 Philippine Red Cross
               </Badge>
-              <h1 className="text-5xl md:text-6xl font-bold mb-6 text-blue-950 tracking-tight">
+              <h1 className="text-3xl sm:text-5xl md:text-6xl font-bold mb-6 text-blue-950 tracking-tight">
                 AlayDugo Blood Bank Management System
               </h1>
-              <p className="text-xl text-muted-foreground mb-8">
+              <p className="text-base sm:text-xl text-muted-foreground mb-8">
                 A comprehensive platform for managing blood donations,
                 inventory, and emergency requests across the Philippine Red
                 Cross network.
@@ -118,12 +118,12 @@ const Home = () => {
             <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/80 to-background/60" />
           </div>
 
-          <div className="container mx-auto px-4 py-16 relative z-10">
+          <div className="container mx-auto px-4 py-12 sm:py-16 relative z-10">
             <div className="max-w-2xl">
               <Badge variant="emergency" className="mb-4">
                 Philippine Red Cross
               </Badge>
-              <h1 className="text-4xl md:text-5xl font-bold text-blue-950 tracking-tight">
+              <h1 className="text-2xl sm:text-4xl md:text-5xl font-bold text-blue-950 tracking-tight">
                 Welcome to AlayDugo
               </h1>
             </div>
@@ -155,7 +155,7 @@ const Home = () => {
               Every donation counts. Join our network of donors and help ensure
               blood availability for those in need across the Philippines.
             </p>
-            <div className="flex gap-4 justify-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button size="lg" variant="secondary" asChild>
                 <Link to="/donor-register">Register as Donor</Link>
               </Button>

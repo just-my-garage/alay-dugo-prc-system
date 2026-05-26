@@ -51,23 +51,24 @@ const Inventory = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-4xl font-bold mb-2 text-foreground">
+            <h1 className="text-2xl sm:text-4xl font-bold mb-2 text-foreground">
               Blood Inventory
             </h1>
             <p className="text-muted-foreground">
               Real-time blood unit tracking across PRC network
             </p>
           </div>
-          <div className="flex gap-3">
-            <Button variant="outline" onClick={exportToCSV}>
+          <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+            <Button variant="outline" onClick={exportToCSV} className="w-full sm:w-auto">
               <Package className="mr-2 h-4 w-4" />
               Export Report
             </Button>
             <Button
               variant="default"
               onClick={() => setIsRecordDialogOpen(true)}
+              className="w-full sm:w-auto"
             >
               Record New Unit
             </Button>
@@ -75,7 +76,7 @@ const Inventory = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="pt-6">
               <div className="text-sm text-muted-foreground mb-1">
@@ -137,7 +138,7 @@ const Inventory = () => {
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-6 my-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
           {/* Low Stock Alerts */}
           <Card>
             <CardHeader>
@@ -158,7 +159,7 @@ const Inventory = () => {
                 ) : (
                   lowStockAlerts.map((item: any, index: number) => (
                     <div key={index} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-muted-foreground" />
                           <span className="font-semibold text-foreground">
@@ -206,7 +207,7 @@ const Inventory = () => {
               <div className="space-y-3">
                 {recentTransfers.map((transfer) => (
                   <div key={transfer.id} className="p-4 border rounded-lg">
-                    <div className="flex items-center justify-between mb-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
                       <Badge variant="default">{transfer.bloodType}</Badge>
                       <div className="text-sm text-muted-foreground flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
@@ -214,7 +215,7 @@ const Inventory = () => {
                       </div>
                     </div>
                     <div className="text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2 mb-1">
+                    <div className="flex flex-wrap items-center gap-2 mb-1">
                         <span className="font-semibold text-foreground">
                           {transfer.from}
                         </span>
@@ -247,9 +248,9 @@ const Inventory = () => {
               {inventoryData.map((item) => (
                 <div
                   key={item.bloodType}
-                  className="p-5 border rounded-lg hover:bg-secondary/50 transition-colors"
+                  className="p-4 sm:p-5 border rounded-lg hover:bg-secondary/50 transition-colors"
                 >
-                  <div className="flex items-center justify-between mb-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-3">
                     <div className="flex items-center gap-4">
                       <div className="p-3 bg-primary/10 rounded-lg">
                         <Droplets className="h-6 w-6 text-primary" />
@@ -263,8 +264,8 @@ const Inventory = () => {
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-6">
-                      <div className="text-right">
+                    <div className="flex flex-wrap items-center gap-4 sm:gap-6">
+                      <div className="text-left sm:text-right">
                         <div className="text-3xl font-bold text-foreground">
                           {item.total}
                         </div>
@@ -281,7 +282,7 @@ const Inventory = () => {
                       )}
                     </div>
                   </div>
-                  <div className="grid grid-cols-3 gap-4 pt-3 border-t">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-3 border-t">
                     <div>
                       <div className="text-sm text-muted-foreground">
                         Available

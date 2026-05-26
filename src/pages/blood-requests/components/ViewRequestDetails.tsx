@@ -126,7 +126,7 @@ const ViewRequestDetails = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
@@ -166,7 +166,7 @@ const ViewRequestDetails = ({
                       {request.hospitalData.address}
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <div className="text-sm text-muted-foreground mb-1">
                         City
@@ -198,7 +198,7 @@ const ViewRequestDetails = ({
               <h3 className="text-lg font-semibold">Request Information</h3>
             </div>
             <div className="bg-secondary/30 rounded-lg p-4 space-y-3">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">
                     Request ID
@@ -217,7 +217,7 @@ const ViewRequestDetails = ({
                 </div>
               </div>
               <Separator />
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-muted-foreground mb-2">
                     Urgency Level
@@ -301,7 +301,7 @@ const ViewRequestDetails = ({
 
           {/* Summary */}
           <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
-            <div className="grid grid-cols-3 gap-4 text-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center">
               <div>
                 <div className="text-2xl font-bold text-primary">
                   {request.items.reduce(

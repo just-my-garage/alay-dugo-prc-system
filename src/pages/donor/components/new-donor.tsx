@@ -43,7 +43,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="firstName">First Name</Label>
               <Input
@@ -68,7 +68,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="dob">Date of Birth</Label>
               <Input
@@ -105,7 +105,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="phone">Contact Number</Label>
               <Input
@@ -143,7 +143,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
             />
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="city">City</Label>
               <Input
@@ -176,7 +176,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
             </div>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid md:grid-cols-2 gap-4 md:gap-6">
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -203,8 +203,8 @@ const NewDonorComponent = ({ setShowRegistration }) => {
             </div>
           </div>
 
-          <div className="flex gap-4 pt-4">
-            <Button type="submit" variant="default" disabled={isLoading}>
+          <div className="flex flex-col sm:flex-row gap-4 pt-4">
+            <Button type="submit" variant="default" disabled={isLoading} className="w-full sm:w-auto">
               {isLoading ? "Registering..." : "Register Donor"}
             </Button>
             <Button
@@ -212,6 +212,7 @@ const NewDonorComponent = ({ setShowRegistration }) => {
               variant="outline"
               onClick={() => setShowRegistration(false)}
               disabled={isLoading}
+              className="w-full sm:w-auto"
             >
               Cancel
             </Button>
