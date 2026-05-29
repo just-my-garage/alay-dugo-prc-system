@@ -225,7 +225,7 @@ const DonorRegister = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email">Email Address (Optional)</Label>
+        <Label htmlFor="email">Email Address <span className="text-destructive">*</span></Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
           <Input
@@ -235,6 +235,7 @@ const DonorRegister = () => {
             value={formData.email}
             onChange={(e) => handleInputChange("email", e.target.value)}
             className="pl-10"
+            required
           />
         </div>
         <p className="text-xs text-muted-foreground">

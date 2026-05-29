@@ -2,15 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./auth.context";
 import { DonorFormData } from "./auth.entity";
-import { supabase } from "@/integrations/supabase/client";
 
 export const useRegister = () => {
   const navigate = useNavigate();
 
-  const { 
-    signUpNewUser, 
-    signInWithGoogle 
-  } = useAuth();
+  const { signUpNewUser } = useAuth();
 
   const [formData, setFormData] = React.useState<DonorFormData>({
     first_name: "",
@@ -35,6 +31,7 @@ export const useRegister = () => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [success, setSuccess] = React.useState<boolean>(false);
   const [error, setError] = React.useState<string>("");
+  const submitLockRef = React.useRef<boolean>(false);
 
   const handleInputChange = (field: keyof DonorFormData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -138,7 +135,6 @@ export const useRegister = () => {
   }
 
   const handleNext = () => {
-    console.log(currentStep)
     setError("");
 
     if (currentStep === 1 && !validateStep1()) return;
@@ -152,7 +148,6 @@ export const useRegister = () => {
   };
 
   const handleBack = () => {
-    console.log(currentStep)
     setError("");
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
@@ -161,45 +156,49 @@ export const useRegister = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!validateStep3()) return;
+    if (submitLockRef.current || isLoading) return;
+    if (!validateStep4()) return;
 
     setError("");
+    submitLockRef.current = true;
     setIsLoading(true);
 
-    // Simulate API call
     try {
-      const result = await signUpNewUser(formData.email, formData.password); // Call context function
+      const result = await signUpNewUser(formData.email, formData.password, {
+        first_name: formData.first_name,
+        last_name: formData.last_name,
+        date_of_birth: formData.date_of_birth,
+        blood_type: formData.blood_type,
+        contact_number: formData.contact_number,
+        address: formData.address,
+        city: formData.city,
+        province: formData.province,
+        zip_code: formData.zip_code,
+      });
 
       if (result.success) {
-        const { error } = await supabase.from('users').insert([
-          {
-            first_name: formData.first_name,
-            last_name: formData.last_name,
-            date_of_birth: formData.date_of_birth,
-            blood_type: formData.blood_type,
-            contact_number: formData.contact_number,
-            email: formData.email,
-            address: formData.address,
-            city: formData.city,
-            province: formData.province,
-            zip_code: formData.zip_code,
-          }
-        ]);
+        setSuccess(true);
+      } else {
+        const apiMessage = String(result.error?.message || "");
 
-        if (error) {
-          console.log(error)
-          setError("Failed to save donor details. Please try again.");
-          setIsLoading(false);
+        const normalizedMessage = apiMessage.toLowerCase();
+
+        if (
+          normalizedMessage.includes("only request this after") ||
+          normalizedMessage.includes("rate limit") ||
+          normalizedMessage.includes("too many")
+        ) {
+          setError("Too many signup attempts. Please wait a few seconds and try again.");
           return;
         }
-        setSuccess(true); 
-      } else {
-        setError(result.error.message); // Show error message on failure
+
+        setError(apiMessage || "Signup failed. Please try again.");
       }
-    } catch (err) {
-      setError("An unexpected error occurred."); // Catch unexpected errors
+    } catch {
+      setError("An unexpected error occurred.");
     } finally {
-      setIsLoading(false); // End loading state
+      submitLockRef.current = false;
+      setIsLoading(false);
     }
   };
 

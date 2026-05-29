@@ -14,10 +14,15 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
   const [isLoading, setIsLoading] = useState(true);
 
   //-------------------- Sign up -------------------------p
-  const signUpNewUser = async (email: string, password: string) => {
+  const signUpNewUser = async (
+    email: string,
+    password: string,
+    metadata?: Record<string, unknown>
+  ) => {
     const { data, error } = await supabase.auth.signUp({
       email: email.toLowerCase(),
       password: password,
+      options: metadata ? { data: metadata } : undefined,
     });
 
     if (error) {

@@ -3,11 +3,13 @@
   "started_at": "2026-05-25T12:24:45.909Z",
   "session_ids": [
     "ses_1a0f485efffe33FRCqGXeHriSR",
-    "ses_19fbf07d0ffev9q70g34mxoGsZ"
+    "ses_19fbf07d0ffev9q70g34mxoGsZ",
+    "ses_19b96a0afffeNCb8uzYGkzXlcO"
   ],
   "session_origins": {
     "ses_1a0f485efffe33FRCqGXeHriSR": "direct",
-    "ses_19fbf07d0ffev9q70g34mxoGsZ": "appended"
+    "ses_19fbf07d0ffev9q70g34mxoGsZ": "appended",
+    "ses_19b96a0afffeNCb8uzYGkzXlcO": "direct"
   },
   "plan_name": "mobile-first-responsive-overhaul",
   "agent": "atlas",
