@@ -1,5 +1,5 @@
-import { useParams, useNavigate, Link } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useParams, useNavigate } from "react-router-dom";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +9,6 @@ import Loading from "@/components/loading";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { useAuth } from "@/pages/auth/auth.context";
-import { toast } from "sonner";
 import { useState } from "react";
 import ScheduleDonationModal from "./ScheduleDonationModal";
 
@@ -86,60 +85,6 @@ const DriveDetails = () => {
     enabled: !!driveIdNum && !!userProfile?.donor_id && isDonor,
   });
 
-  // Schedule donation mutation
-  const scheduleDonation = useMutation({
-    mutationFn: async () => {
-      if (!userProfile?.donor_id || !driveIdNum) {
-        throw new Error("Missing required information");
-      }
-
-      const { error } = await supabase
-        .from("donations")
-        .insert({
-          donor_id: userProfile.donor_id,
-          drive_id: driveIdNum,
-          donation_date: drive?.start_datetime.split('T')[0] || new Date().toISOString().split('T')[0],
-          donation_location_type: "Drive",
-          screening_result: "Passed",
-          notes: "Scheduled donation"
-        });
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user_drive_donation", driveIdNum, userProfile?.donor_id] });
-      queryClient.invalidateQueries({ queryKey: ["drive_donations", driveIdNum] });
-      toast.success("Donation scheduled successfully!");
-    },
-    onError: (error) => {
-      toast.error("Failed to schedule donation: " + error.message);
-    }
-  });
-
-  // Cancel donation mutation
-  const cancelDonation = useMutation({
-    mutationFn: async () => {
-      if (!userDonation?.donation_id) {
-        throw new Error("No donation to cancel");
-      }
-
-      const { error } = await supabase
-        .from("donations")
-        .delete()
-        .eq("donation_id", userDonation.donation_id);
-
-      if (error) throw error;
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["user_drive_donation", driveIdNum, userProfile?.donor_id] });
-      queryClient.invalidateQueries({ queryKey: ["drive_donations", driveIdNum] });
-      toast.success("Donation cancelled successfully!");
-    },
-    onError: (error) => {
-      toast.error("Failed to cancel donation: " + error.message);
-    }
-  });
-
   if (isDriveLoading || isDonationsLoading) {
     return <Loading component={false} />;
   }
@@ -190,7 +135,7 @@ const DriveDetails = () => {
 
   return (
     <>
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         <Button
           variant="ghost"
           onClick={() => navigate("/")}
@@ -201,105 +146,146 @@ const DriveDetails = () => {
         </Button>
 
         {/* Main Drive Information */}
-        <Card className="mb-6">
-          <CardHeader>
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <div className="flex items-center gap-3 mb-2">
-                  <CardTitle className="text-3xl">{drive.drive_name}</CardTitle>
-                  {getStatusBadge()}
+        <Card className="mb-6 overflow-hidden border-primary/20">
+          <CardHeader className="bg-gradient-to-r from-primary/5 via-background to-secondary/50">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                <div className="w-fit rounded-lg bg-primary/10 p-3">
+                  <Calendar className="h-7 w-7 text-primary" />
                 </div>
-                <CardDescription className="text-base">
-                  Donation Drive Details
-                </CardDescription>
+                <div className="min-w-0 flex-1">
+                  <div className="mb-2 flex flex-wrap items-center gap-3">
+                    <CardTitle className="break-words text-2xl sm:text-3xl">
+                      {drive.drive_name}
+                    </CardTitle>
+                    {getStatusBadge()}
+                  </div>
+                  <CardDescription className="text-sm sm:text-base">
+                    Complete drive details, schedule, donor activity, and collection progress
+                  </CardDescription>
+                </div>
               </div>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
+          <CardContent className="pt-6">
+            <div className="grid gap-4 lg:grid-cols-3">
               {/* Location Information */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
+              <div className="rounded-lg border bg-card p-4 transition-colors hover:bg-secondary/30 sm:p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2">
                     <MapPin className="h-5 w-5 text-primary" />
-                    Location
-                  </h3>
-                  <div className="space-y-2 text-muted-foreground">
-                    <p className="flex items-start gap-2">
-                      <span className="font-medium text-foreground">Venue:</span>
+                  </div>
+                  <h3 className="font-semibold text-foreground">Location</h3>
+                </div>
+                <div className="space-y-3 text-sm">
+                  <div>
+                    <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Venue
+                    </p>
+                    <p className="break-words font-medium text-foreground">
                       {drive.venue_address}
                     </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">City:</span>
-                      {drive.city}
-                    </p>
-                    <p className="flex items-center gap-2">
-                      <span className="font-medium text-foreground">Province:</span>
-                      {drive.province}
-                    </p>
                   </div>
-                </div>
-
-                {drive.prc_centers && (
-                  <div>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-primary" />
-                      Organizing Center
-                    </h3>
-                    <div className="space-y-2 text-muted-foreground">
-                      <p className="font-medium text-foreground">{drive.prc_centers.center_name}</p>
-                      <p>{drive.prc_centers.address}</p>
+                  <div className="grid grid-cols-1 gap-3 border-t pt-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+                    <div>
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        City
+                      </p>
+                      <p className="text-foreground">{drive.city}</p>
+                    </div>
+                    <div>
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Province
+                      </p>
+                      <p className="text-foreground">{drive.province}</p>
                     </div>
                   </div>
-                )}
+                </div>
               </div>
 
-              {/* Schedule Information */}
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                    <Calendar className="h-5 w-5 text-primary" />
-                    Schedule
-                  </h3>
-                  <div className="space-y-3 text-muted-foreground">
+              {drive.prc_centers && (
+                <div className="rounded-lg border bg-card p-4 transition-colors hover:bg-secondary/30 sm:p-5">
+                  <div className="mb-4 flex items-center gap-3">
+                    <div className="rounded-lg bg-primary/10 p-2">
+                      <Building2 className="h-5 w-5 text-primary" />
+                    </div>
+                    <h3 className="font-semibold text-foreground">Organizing Center</h3>
+                  </div>
+                  <div className="space-y-3 text-sm">
                     <div>
-                      <p className="font-medium text-foreground mb-1">Start</p>
-                      <p className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        PRC Center
+                      </p>
+                      <p className="break-words font-medium text-foreground">
+                        {drive.prc_centers.center_name}
+                      </p>
+                    </div>
+                    <div className="border-t pt-3">
+                      <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                        Address
+                      </p>
+                      <p className="break-words text-muted-foreground">
+                        {drive.prc_centers.address}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Schedule Information */}
+              <div className="rounded-lg border bg-card p-4 transition-colors hover:bg-secondary/30 sm:p-5">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="rounded-lg bg-primary/10 p-2">
+                    <Clock className="h-5 w-5 text-primary" />
+                  </div>
+                  <h3 className="font-semibold text-foreground">Schedule</h3>
+                </div>
+                <div className="space-y-4 text-sm">
+                  <div className="rounded-lg bg-primary/5 p-3">
+                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      Start
+                    </p>
+                    <p className="flex items-start gap-2 font-medium text-foreground">
+                      <Calendar className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                      <span>
                         {startDate.toLocaleDateString("en-US", { 
                           weekday: "long", 
                           year: "numeric", 
                           month: "long", 
                           day: "numeric" 
                         })}
-                      </p>
-                      <p className="flex items-center gap-2 ml-6">
-                        <Clock className="h-4 w-4" />
-                        {startDate.toLocaleTimeString("en-US", { 
-                          hour: "2-digit", 
-                          minute: "2-digit" 
-                        })}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground mb-1">End</p>
-                      <p className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
+                      </span>
+                    </p>
+                    <p className="mt-2 flex items-center gap-2 text-muted-foreground">
+                      <Clock className="h-4 w-4 flex-shrink-0" />
+                      {startDate.toLocaleTimeString("en-US", { 
+                        hour: "2-digit", 
+                        minute: "2-digit" 
+                      })}
+                    </p>
+                  </div>
+                  <div className="rounded-lg bg-secondary/50 p-3">
+                    <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                      End
+                    </p>
+                    <p className="flex items-start gap-2 font-medium text-foreground">
+                      <Calendar className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+                      <span>
                         {endDate.toLocaleDateString("en-US", { 
                           weekday: "long", 
                           year: "numeric", 
                           month: "long", 
                           day: "numeric" 
                         })}
-                      </p>
-                      <p className="flex items-center gap-2 ml-6">
-                        <Clock className="h-4 w-4" />
-                        {endDate.toLocaleTimeString("en-US", { 
-                          hour: "2-digit", 
-                          minute: "2-digit" 
-                        })}
-                      </p>
-                    </div>
+                      </span>
+                    </p>
+                    <p className="mt-2 flex items-center gap-2 text-muted-foreground">
+                      <Clock className="h-4 w-4 flex-shrink-0" />
+                      {endDate.toLocaleTimeString("en-US", { 
+                        hour: "2-digit", 
+                        minute: "2-digit" 
+                      })}
+                    </p>
                   </div>
                 </div>
               </div>
@@ -309,33 +295,51 @@ const DriveDetails = () => {
 
         {/* Donor Scheduling Section */}
         {(isUpcoming || isOngoing) && drive.status !== "Cancelled" && (
-          <Card className="mb-6 border-primary/20">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarCheck className="h-5 w-5 text-primary" />
-                Donation Scheduling
-              </CardTitle>
-              <CardDescription>
-                {!session 
-                  ? "Login to schedule your donation for this drive"
-                  : userProfile?.isAdmin
-                  ? "Admin accounts cannot schedule donations"
-                  : userDonation 
-                  ? "You're scheduled for this donation drive"
-                  : "Schedule your donation for this drive"
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => setModalOpen(true)}
-                size="lg"
-                className="w-full sm:w-auto"
-                variant={userDonation ? "outline" : "default"}
-              >
-                <CalendarCheck className="h-5 w-5 mr-2" />
-                {userDonation ? "View Donation Details" : "Schedule Donation"}
-              </Button>
+          <Card className={`mb-6 ${userDonation ? "border-success/20 bg-success/10" : "border-primary/20 bg-primary/5"}`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                  <div className={`w-fit rounded-lg p-3 ${userDonation ? "bg-success/10" : "bg-primary/10"}`}>
+                    <CalendarCheck className={`h-7 w-7 ${userDonation ? "text-success" : "text-primary"}`} />
+                  </div>
+                  <div>
+                    <CardTitle className="mb-2 text-xl sm:text-2xl">
+                      {userDonation ? "Donation Scheduled" : "Plan Your Donation"}
+                    </CardTitle>
+                    <CardDescription className="text-sm sm:text-base">
+                      {!session 
+                        ? "Login to schedule your donation for this drive"
+                        : userProfile?.isAdmin
+                        ? "Admin accounts cannot schedule donations"
+                        : userDonation 
+                        ? "You're scheduled for this donation drive"
+                        : "Schedule your donation for this drive"
+                      }
+                    </CardDescription>
+                    <div className="mt-3 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                      <Badge variant={userDonation ? "success" : "outline"}>
+                        {userDonation ? "Confirmed" : isOngoing ? "Open now" : "Upcoming"}
+                      </Badge>
+                      <span className="flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {startDate.toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit"
+                        })}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => setModalOpen(true)}
+                  size="lg"
+                  className="w-full md:w-auto"
+                  variant={userDonation ? "outline" : "default"}
+                >
+                  <CalendarCheck className="h-5 w-5 mr-2" />
+                  {userDonation ? "View Donation Details" : "Schedule Donation"}
+                </Button>
+              </div>
             </CardContent>
           </Card>
         )}
@@ -355,13 +359,14 @@ const DriveDetails = () => {
         />
 
         {/* Statistics */}
-        <div className="grid md:grid-cols-3 gap-6 mb-6">
-          <Card>
-            <CardContent className="pt-6">
+        <div className="grid grid-cols-1 gap-4 mb-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-6">
+          <Card className="transition-shadow hover:shadow-md">
+            <CardContent className="p-5 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Total Donors</div>
                   <div className="text-3xl font-bold text-foreground">{totalDonors}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Registered for this drive</div>
                 </div>
                 <div className="p-3 bg-primary/10 rounded-lg">
                   <Users className="h-8 w-8 text-primary" />
@@ -370,12 +375,13 @@ const DriveDetails = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="transition-shadow hover:shadow-md">
+            <CardContent className="p-5 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Successful Donations</div>
-                  <div className="text-3xl font-bold text-foreground">{successfulDonations}</div>
+                  <div className="text-3xl font-bold text-success">{successfulDonations}</div>
+                  <div className="text-xs text-muted-foreground mt-1">Passed screening result</div>
                 </div>
                 <div className="p-3 bg-success/10 rounded-lg">
                   <Droplets className="h-8 w-8 text-success" />
@@ -384,14 +390,15 @@ const DriveDetails = () => {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="pt-6">
+          <Card className="transition-shadow hover:shadow-md sm:col-span-2 lg:col-span-1">
+            <CardContent className="p-5 sm:p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-sm text-muted-foreground mb-1">Success Rate</div>
                   <div className="text-3xl font-bold text-foreground">
                     {totalDonors > 0 ? Math.round((successfulDonations / totalDonors) * 100) : 0}%
                   </div>
+                  <div className="text-xs text-muted-foreground mt-1">Successful donors over total</div>
                 </div>
                 <div className="p-3 bg-accent/10 rounded-lg">
                   <Calendar className="h-8 w-8 text-accent" />
@@ -405,20 +412,30 @@ const DriveDetails = () => {
         {Object.keys(bloodTypeBreakdown).length > 0 && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Blood Type Breakdown</CardTitle>
-              <CardDescription>Distribution of blood types collected</CardDescription>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle>Blood Type Breakdown</CardTitle>
+                  <CardDescription>Distribution of blood types collected</CardDescription>
+                </div>
+                <Badge variant="outline">{Object.keys(bloodTypeBreakdown).length} types</Badge>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {Object.entries(bloodTypeBreakdown)
                   .sort((a, b) => b[1] - a[1])
                   .map(([bloodType, count]) => (
-                    <div key={bloodType} className="p-4 border rounded-lg">
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-lg font-bold text-foreground">{bloodType}</span>
+                    <div key={bloodType} className="p-4 border rounded-lg bg-card hover:bg-secondary/50 transition-colors">
+                      <div className="flex items-start justify-between gap-3 mb-3">
+                        <div className="flex items-center gap-3">
+                          <div className="rounded-lg bg-primary/10 p-2">
+                            <Droplets className="h-5 w-5 text-primary" />
+                          </div>
+                          <span className="text-xl font-bold text-foreground">{bloodType}</span>
+                        </div>
                         <Badge variant="outline">{count} units</Badge>
                       </div>
-                      <div className="text-sm text-muted-foreground">
+                      <div className="border-t pt-3 text-sm text-muted-foreground">
                         {totalDonors > 0 ? Math.round((count / totalDonors) * 100) : 0}% of total
                       </div>
                     </div>
@@ -432,29 +449,35 @@ const DriveDetails = () => {
         {donations.length > 0 && (
           <Card>
             <CardHeader>
-              <CardTitle>Recent Donations</CardTitle>
-              <CardDescription>
-                Showing {Math.min(donations.length, 10)} of {donations.length} total donations
-              </CardDescription>
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle>Recent Donations</CardTitle>
+                  <CardDescription>
+                    Showing {Math.min(donations.length, 10)} of {donations.length} total donations
+                  </CardDescription>
+                </div>
+                <Badge variant="outline">Latest activity</Badge>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {donations.slice(0, 10).map((donation) => (
                   <div
                     key={donation.donation_id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors"
+                    className="flex flex-col gap-4 p-4 border rounded-lg hover:bg-secondary/50 transition-colors sm:flex-row sm:items-center sm:justify-between"
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 bg-primary/10 rounded">
+                    <div className="flex items-start gap-4 min-w-0">
+                      <div className="p-2 bg-primary/10 rounded-lg flex-shrink-0">
                         <Droplets className="h-5 w-5 text-primary" />
                       </div>
-                      <div>
-                        <div className="font-semibold text-foreground">
+                      <div className="min-w-0">
+                        <div className="font-semibold text-foreground break-words">
                           {donation.donors?.first_name} {donation.donors?.last_name}
                         </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2 mt-1">
                           <Badge variant="outline">{donation.donors?.blood_type}</Badge>
-                          <span>
+                          <span className="flex items-center gap-1">
+                            <Calendar className="h-3 w-3" />
                             {new Date(donation.donation_date).toLocaleDateString()}
                           </span>
                         </div>
@@ -477,12 +500,14 @@ const DriveDetails = () => {
         )}
 
         {donations.length === 0 && (
-          <Card>
-            <CardContent className="py-12">
-              <div className="text-center text-muted-foreground">
-                <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="text-lg">No donations recorded yet for this drive</p>
-                <p className="text-sm mt-2">Donations will appear here once the drive begins</p>
+          <Card className="border-dashed">
+            <CardContent className="py-12 sm:py-16">
+              <div className="mx-auto max-w-md text-center text-muted-foreground">
+                <div className="mx-auto mb-4 w-fit rounded-full bg-primary/10 p-4">
+                  <Users className="h-10 w-10 text-primary" />
+                </div>
+                <p className="text-lg font-semibold text-foreground">No donations recorded yet</p>
+                <p className="text-sm mt-2">Donations for this drive will appear here once donor activity begins</p>
               </div>
             </CardContent>
           </Card>

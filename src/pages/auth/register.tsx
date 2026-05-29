@@ -51,16 +51,6 @@ const DonorRegister = () => {
     if (success) {
     return (
       <div className="min-h-screen flex flex-col">
-        <nav className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-          <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2">
-              <Droplets className="h-8 w-8 text-primary" />
-              <span className="text-xl font-bold text-foreground">
-                AlayDugo
-              </span>
-            </Link>
-          </div>
-        </nav>
 
         <div className="flex-1 flex items-center justify-center bg-secondary/30 py-12 px-4">
           <Card className="w-full max-w-md shadow-lg text-center">
