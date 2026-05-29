@@ -52,7 +52,7 @@ const DonorRegister = () => {
     return (
       <div className="min-h-screen flex flex-col">
 
-        <div className="flex-1 flex items-center justify-center bg-secondary/30 py-12 px-4">
+        <div className="flex-1 flex items-center justify-center bg-secondary/30 py-12 px-2 lg:px-4">
           <Card className="w-full max-w-md shadow-lg text-center">
             <CardContent className="pt-12 pb-8">
               <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-success/10 mb-6">

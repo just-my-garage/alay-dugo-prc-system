@@ -49,7 +49,7 @@ const Inventory = () => {
     <div>
       {/* Navigation */}
 
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-0 lg:px-4 py-8">
         {/* Header */}
         <div className="mb-8 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>

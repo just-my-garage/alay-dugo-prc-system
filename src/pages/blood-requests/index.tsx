@@ -299,7 +299,7 @@ const Requests = () => {
   return (
     <>
       {/* Navigation */}
-      <div className="container mx-auto px-4 py-4 sm:py-6 lg:py-8 lg:grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div className="container px-0 lg:px-4 py-4 sm:py-6 lg:py-8 lg:grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
         {/* Header */}
         <div className="mb-4 lg:mb-0.5 space-y-3 lg:space-y-2 lg:sticky lg:top-28 lg:self-start lg:h-fit">
           <div className="mb-6 lg:mb-4 flex flex-col sm:flex-row lg:flex-col items-start sm:items-center lg:items-start justify-between space-y-4 sm:space-y-0 lg:space-y-3">

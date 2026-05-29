@@ -168,16 +168,16 @@ const Dashboard = ({
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
+      <div className="container px-0 lg:px-4 py-8">
         {/* Header */}
         <div className="mb-8">
           <p className="text-muted-foreground text-center">
-            Overview of blood bank operations across PRC network
+            Overview of blood bank operations across<br className="inline lg:hidden " /> the PRC network
           </p>
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-2 lg:gap-6 mb-8">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -278,7 +278,7 @@ const Dashboard = ({
         </div>
 
         {/* Schedule My Donation CTA - Only show for non-admin logged-in users */}
-        {session && !userProfile?.isAdmin && (
+        {session && !userProfile?.is_admin && (
           <Card className="mb-8 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="py-8">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -322,7 +322,7 @@ const Dashboard = ({
                   Scheduled blood donation events across the network
                 </CardDescription>
               </div>
-              {session && userProfile?.isAdmin && (
+              {session && userProfile?.is_admin && (
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/schedule-drive">Schedule New Drive</Link>
                 </Button>
@@ -570,7 +570,7 @@ const Dashboard = ({
                     Current stock levels by blood type
                   </CardDescription>
                 </div>
-                {session && userProfile?.isAdmin && (
+                {session && userProfile?.is_admin && (
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/inventory">Manage</Link>
                   </Button>

@@ -6,7 +6,7 @@ const Layout = () => {
   return (
     <div className="min-h-screen bg-background">
       <Header />
-      <main className="w-full px-4 sm:px-6 md:px-8">
+      <main className="w-full px-2 sm:px-6 md:px-8">
         <Outlet />
       </main>
       <Footer />

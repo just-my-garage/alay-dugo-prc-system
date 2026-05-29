@@ -38,12 +38,12 @@ const DonorLogin = () => {
     <div className="min-h-screen flex flex-col">
 
       {/* Main Content */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 items-center lg:px-48 bg-secondary/30 py-12 ">
+      <div className="grid grid-cols-1 lg:grid-cols-2 items-center lg:px-48 bg-secondary/30 py-12 px-2 ">
         <div className="justify-self-start mb-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
               <Heart className="h-8 w-8 text-primary" />
             </div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
+            <h1 className="text-3xl text-center font-bold text-foreground mb-2">
               Welcome Back, Hero
             </h1>
             <p className="text-muted-foreground">
