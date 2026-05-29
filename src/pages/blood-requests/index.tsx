@@ -52,7 +52,7 @@ const Requests = () => {
   const [viewDetailsRequest, setViewDetailsRequest] = useState<any>(null);
   const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
   const [updateRequestId, setUpdateRequestId] = useState<number | null>(null);
-  const [activeTab, setActiveTab] = useState(session && userProfile?.is_admin ? "myRequests" : "emergency");
+  const [activeTab, setActiveTab] = useState(session && userProfile?.isAdmin ? "myRequests" : "emergency");
 
   const handleFulfillClick = (request: any) => {
     setSelectedRequest(request);
@@ -188,7 +188,7 @@ const Requests = () => {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-2">
-        {session && userProfile?.is_admin && (
+        {session && userProfile?.isAdmin && (
           <>
             {request.status !== "Fulfilled" && (
               <button
@@ -311,7 +311,7 @@ const Requests = () => {
                 Manage and fulfill hospital blood requests
               </p>
             </div>
-            {session && userProfile?.is_admin && (
+            {session && userProfile?.isAdmin && (
               <Button variant="default" size="lg" asChild className="w-full sm:w-auto lg:w-full lg:mt-8">
                 <Link to="/create-request">
                   <AlertCircle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
@@ -404,7 +404,7 @@ const Requests = () => {
         <div className="col-span-1 lg:col-span-2">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
             <TabsList className="mb-4 sm:mb-6 flex w-full h-auto gap-1 overflow-x-auto overflow-y-hidden p-1">
-              {session && userProfile?.is_admin ? (
+              {session && userProfile?.isAdmin ? (
                 <TabsTrigger value="myRequests" className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
                   My Requests ({myPendingRequests.length})
                 </TabsTrigger>
@@ -436,7 +436,7 @@ const Requests = () => {
               </TabsTrigger>
             </TabsList>
 
-            {session && userProfile?.is_admin ? (
+            {session && userProfile?.isAdmin ? (
               <TabsContent value="myRequests">
                 <Card>
                   <CardHeader className="px-4 sm:px-6">

@@ -336,7 +336,7 @@ const ViewRequestDetails = ({
               </div>
             </div>
           </div>
-          {session && userProfile?.is_admin && onDelete && (
+          {session && userProfile?.isAdmin && onDelete && (
             <Button
               variant="destructive"
               size="sm"

@@ -278,7 +278,7 @@ const Dashboard = ({
         </div>
 
         {/* Schedule My Donation CTA - Only show for non-admin logged-in users */}
-        {session && !userProfile?.is_admin && (
+        {session && !userProfile?.isAdmin && (
           <Card className="mb-8 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
             <CardContent className="py-8">
               <div className="flex flex-col md:flex-row items-center justify-between gap-6">
@@ -322,7 +322,7 @@ const Dashboard = ({
                   Scheduled blood donation events across the network
                 </CardDescription>
               </div>
-              {session && userProfile?.is_admin && (
+              {session && userProfile?.isAdmin && (
                 <Button variant="outline" size="sm" asChild>
                   <Link to="/schedule-drive">Schedule New Drive</Link>
                 </Button>
@@ -570,7 +570,7 @@ const Dashboard = ({
                     Current stock levels by blood type
                   </CardDescription>
                 </div>
-                {session && userProfile?.is_admin && (
+                {session && userProfile?.isAdmin && (
                   <Button variant="outline" size="sm" asChild>
                     <Link to="/inventory">Manage</Link>
                   </Button>

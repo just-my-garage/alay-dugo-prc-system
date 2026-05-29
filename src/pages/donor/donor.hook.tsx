@@ -40,12 +40,12 @@ const useDonorPage = () => {
   };
 
   const fetch = useQuery({
-    queryKey: ["user-donors", debouncedSearch, currentPage],
+    queryKey: ["donors", debouncedSearch, currentPage],
     queryFn: async () => {
       setIsLoading(true);
       
       // First, get the total count
-      let countQuery = supabase.from("users").select("*", { count: "exact", head: true });
+       let countQuery = supabase.from("donors").select("*", { count: "exact", head: true });
       if (debouncedSearch.trim()) {
         countQuery = countQuery.or(
           `first_name.ilike.%${debouncedSearch}%,` +
@@ -61,7 +61,7 @@ const useDonorPage = () => {
       const from = (currentPage - 1) * itemsPerPage;
       const to = from + itemsPerPage - 1;
       
-      let query = supabase.from("users").select("*").range(from, to);
+      let query = supabase.from("donors").select("*").range(from, to);
 
       // Apply search filter if search query exists
       if (debouncedSearch.trim()) {
@@ -77,7 +77,6 @@ const useDonorPage = () => {
       if (error) throw error;
       if (data) { 
         setIsLoading(false);
-        console.log(data)
         return data;
       }
     },
@@ -87,7 +86,7 @@ const useDonorPage = () => {
     mutationKey: ["delete-donor"],
     mutationFn: async (donor_id: number) => {
       setIsLoading(true);
-      const { error } = await supabase.from("users").delete().eq("donor_id", donor_id);
+      const { error } = await supabase.from("donors").delete().eq("donor_id", donor_id);
       if (error) throw error;
     },
   });

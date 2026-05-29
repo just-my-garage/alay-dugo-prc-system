@@ -68,7 +68,7 @@ const Header = () => {
               >
                 <Link to="/">Dashboard</Link>
               </Button>
-              {userProfile?.is_admin && (
+               {userProfile?.isAdmin && (
                 <>
                   <Button
                     variant="ghost"
@@ -244,7 +244,7 @@ const Header = () => {
                     >
                       <Link to="/">Dashboard</Link>
                     </Button>
-                    {userProfile?.is_admin && (
+                     {userProfile?.isAdmin && (
                       <>
                         <Button
                           variant={isActive("/donors") ? "default" : "ghost"}

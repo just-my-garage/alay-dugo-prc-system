@@ -21,7 +21,7 @@ const DriveDetails = () => {
   const queryClient = useQueryClient();
   const [modalOpen, setModalOpen] = useState(false);
   
-  const isDonor = session && !userProfile?.is_admin;
+  const isDonor = session && !userProfile?.isAdmin;
 
   // Fetch donation drive details
   const { data: drive, isLoading: isDriveLoading } = useQuery({
@@ -53,7 +53,7 @@ const DriveDetails = () => {
         .from("donations")
         .select(`
           *,
-          users (
+          donors!donations_donor_id_fkey(
             first_name,
             last_name,
             blood_type
@@ -182,8 +182,8 @@ const DriveDetails = () => {
   // Calculate statistics
   const totalDonors = donations.length;
   const successfulDonations = donations.filter(d => d.screening_result === "Passed").length;
-  const bloodTypeBreakdown = donations.reduce((acc, donation) => {
-    const bloodType = donation.users?.blood_type || "Unknown";
+    const bloodTypeBreakdown = donations.reduce((acc, donation) => {
+    const bloodType = donation.donors?.blood_type || "Unknown";
     acc[bloodType] = (acc[bloodType] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
@@ -318,7 +318,7 @@ const DriveDetails = () => {
               <CardDescription>
                 {!session 
                   ? "Login to schedule your donation for this drive"
-                  : userProfile?.is_admin
+                  : userProfile?.isAdmin
                   ? "Admin accounts cannot schedule donations"
                   : userDonation 
                   ? "You're scheduled for this donation drive"
@@ -450,10 +450,10 @@ const DriveDetails = () => {
                       </div>
                       <div>
                         <div className="font-semibold text-foreground">
-                          {donation.users?.first_name} {donation.users?.last_name}
+                          {donation.donors?.first_name} {donation.donors?.last_name}
                         </div>
                         <div className="text-sm text-muted-foreground flex items-center gap-2">
-                          <Badge variant="outline">{donation.users?.blood_type}</Badge>
+                          <Badge variant="outline">{donation.donors?.blood_type}</Badge>
                           <span>
                             {new Date(donation.donation_date).toLocaleDateString()}
                           </span>

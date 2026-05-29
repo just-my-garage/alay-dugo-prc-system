@@ -140,7 +140,7 @@ const CreateRequest = () => {
       if (itemsError) throw itemsError;
 
       // Auto-track the request for the current admin user
-      if (session && userProfile?.is_admin && requestData.request_id) {
+      if (session && userProfile?.isAdmin && requestData.request_id) {
         const tracked = localStorage.getItem("admin_tracked_requests");
         const trackedRequests = tracked ? JSON.parse(tracked) : [];
         if (!trackedRequests.includes(requestData.request_id)) {

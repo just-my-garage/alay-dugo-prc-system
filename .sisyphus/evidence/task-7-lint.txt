@@ -1,0 +1,133 @@
+
+> vite_react_shadcn_ts@0.0.0 lint
+> eslint .
+
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/badge.tsx
+  32:17  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/button.tsx
+  49:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/command.tsx
+  24:11  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/form.tsx
+  129:10  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/navigation-menu.tsx
+  111:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/sidebar.tsx
+  636:3  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/sonner.tsx
+  27:19  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/textarea.tsx
+  5:18  error  An interface declaring no members is equivalent to its supertype  @typescript-eslint/no-empty-object-type
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/components/ui/toggle.tsx
+  37:18  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/hooks/use-blood-requests.ts
+  30:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  43:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  52:52  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  53:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  54:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  55:56  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:54  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/Account.tsx
+   56:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  155:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/Inventory/components/RecordNewUnit.tsx
+   94:32  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  114:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  200:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/Inventory/index.tsx
+  160:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/Inventory/inventory.hook.tsx
+  47:28  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  48:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:25  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  85:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/auth/auth.context.tsx
+  141:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/blood-requests/components/FulfillRequest.tsx
+   18:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   48:55  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   53:60  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   94:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  124:39  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/blood-requests/components/UpdateRequest.tsx
+   85:6   warning  React Hook useEffect has a missing dependency: 'fetchRequestData'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  150:59  error    Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/blood-requests/components/ViewRequestDetails.tsx
+   56:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   60:13  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   61:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  246:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  308:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  319:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  330:41  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/blood-requests/index.tsx
+   50:58  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   52:64  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   57:40  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   62:44  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  118:48  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  158:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  228:45  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  232:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  390:33  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/blood-requests/requests.hook.tsx
+  45:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  49:53  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  79:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/donor/index.tsx
+  109:42  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/home/components/Dashboard.tsx
+   34:22  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   41:12  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   42:16  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+   64:6   warning  React Hook useEffect has a missing dependency: 'drivePage'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+   96:36  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  387:47  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  514:63  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  530:43  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+  537:53  error    Unexpected any. Specify a different type                                                                      @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/home/components/ScheduleDonationModal.tsx
+   30:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   31:16  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   32:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   80:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:22  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/home/components/ScheduleDrive.tsx
+  67:21  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/src/pages/home/home.hook.tsx
+  17:35  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/home/kyae-dev/Repos/school/alay-dugo-prc-system/tailwind.config.ts
+  104:13  error  A `require()` style import is forbidden  @typescript-eslint/no-require-imports
+
+✖ 74 problems (64 errors, 10 warnings)
+

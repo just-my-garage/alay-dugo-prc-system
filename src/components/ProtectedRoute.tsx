@@ -35,7 +35,7 @@ const ProtectedRoute = ({
   }
 
   // If admin is required but user is not admin
-  if (requireAdmin && (!session || !userProfile?.is_admin)) {
+  if (requireAdmin && (!session || !userProfile?.isAdmin)) {
     return <Navigate to="/" replace />;
   }
 

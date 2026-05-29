@@ -47,7 +47,7 @@ export const RecordNewUnit = ({ open, onOpenChange }: RecordNewUnitProps) => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("donations")
-        .select("donation_id, donation_date, donor_id, users(first_name, last_name)")
+        .select("donation_id, donation_date, donor_id, donors!donations_donor_id_fkey(first_name, last_name)")
         .order("donation_date", { ascending: false });
       
       if (error) throw error;
@@ -199,7 +199,7 @@ export const RecordNewUnit = ({ open, onOpenChange }: RecordNewUnitProps) => {
                 <SelectContent>
                   {donations.map((donation: any) => (
                     <SelectItem key={donation.donation_id} value={donation.donation_id.toString()}>
-                      ID: {donation.donation_id} - {donation.users?.first_name} {donation.users?.last_name} ({donation.donation_date})
+                      ID: {donation.donation_id} - {donation.donors?.first_name} {donation.donors?.last_name} ({donation.donation_date})
                     </SelectItem>
                   ))}
                 </SelectContent>

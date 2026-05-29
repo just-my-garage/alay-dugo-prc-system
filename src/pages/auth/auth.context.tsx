@@ -3,14 +3,17 @@ import { supabase } from "@/integrations/supabase/client";
 
 const AuthContext = createContext(undefined);
 
+type UserProfile = {
+  donor_id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  isAdmin: boolean;
+} | null;
+
 export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
   const [session, setSession] = useState(undefined);
-  const [userProfile, setUserProfile] = useState<{
-    first_name: string;
-    last_name: string;
-    email: string;
-    is_admin: boolean;
-  } | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   //-------------------- Sign up -------------------------p
@@ -72,14 +75,19 @@ export const AuthContextProvider = ({ children }: React.PropsWithChildren) => {
 
   useEffect(() => {
     const fetchUserProfile = async (email: string) => {
-      const { data } = await supabase
-        .from("users")
-        .select("donor_id, first_name, last_name, email, is_admin")
-        .eq("email", email)
-        .single();
-      
-      if (data) {
-        setUserProfile(data);
+      setIsLoading(true);
+
+      const { data, error } = await supabase
+        .from("donors")
+        .select("donor_id, first_name, last_name, email, isAdmin")
+        .eq("email", email.toLowerCase())
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching user profile:", error);
+        setUserProfile(null);
+      } else {
+        setUserProfile(data ?? null);
       }
       setIsLoading(false);
     };

@@ -10,25 +10,22 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "13.0.5"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
       blood_product_types: {
         Row: {
-          description: string | null
           product_name: string
           product_type_id: number
           shelf_life_days: number
         }
         Insert: {
-          description?: string | null
           product_name: string
           product_type_id?: number
           shelf_life_days: number
         }
         Update: {
-          description?: string | null
           product_name?: string
           product_type_id?: number
           shelf_life_days?: number
@@ -261,7 +258,7 @@ export type Database = {
             foreignKeyName: "donations_donor_id_fkey"
             columns: ["donor_id"]
             isOneToOne: false
-            referencedRelation: "users"
+            referencedRelation: "donors"
             referencedColumns: ["donor_id"]
           },
           {
@@ -327,6 +324,72 @@ export type Database = {
           latitude?: number | null
           longitude?: number | null
           province?: string
+        }
+        Relationships: []
+      }
+      donors: {
+        Row: {
+          address: string | null
+          auth_user_id: string | null
+          blood_type: string
+          city: string | null
+          contact_number: string
+          created_at: string | null
+          date_of_birth: string
+          donor_id: number
+          eligibility_status:
+            | Database["public"]["Enums"]["eligibility_status_enum"]
+            | null
+          email: string | null
+          first_name: string
+          isAdmin: boolean
+          last_donation_date: string | null
+          last_name: string
+          province: string | null
+          updated_at: string | null
+          zip_code: string | null
+        }
+        Insert: {
+          address?: string | null
+          auth_user_id?: string | null
+          blood_type: string
+          city?: string | null
+          contact_number: string
+          created_at?: string | null
+          date_of_birth: string
+          donor_id?: number
+          eligibility_status?:
+            | Database["public"]["Enums"]["eligibility_status_enum"]
+            | null
+          email?: string | null
+          first_name: string
+          isAdmin?: boolean
+          last_donation_date?: string | null
+          last_name: string
+          province?: string | null
+          updated_at?: string | null
+          zip_code?: string | null
+        }
+        Update: {
+          address?: string | null
+          auth_user_id?: string | null
+          blood_type?: string
+          city?: string | null
+          contact_number?: string
+          created_at?: string | null
+          date_of_birth?: string
+          donor_id?: number
+          eligibility_status?:
+            | Database["public"]["Enums"]["eligibility_status_enum"]
+            | null
+          email?: string | null
+          first_name?: string
+          isAdmin?: boolean
+          last_donation_date?: string | null
+          last_name?: string
+          province?: string | null
+          updated_at?: string | null
+          zip_code?: string | null
         }
         Relationships: []
       }

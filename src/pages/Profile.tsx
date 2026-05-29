@@ -29,6 +29,7 @@ const Profile = () => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [profileNotFound, setProfileNotFound] = useState(false);
   const [profileData, setProfileData] = useState<ProfileData>({
     first_name: "",
     last_name: "",
@@ -49,32 +50,41 @@ const Profile = () => {
 
     const fetchProfile = async () => {
       try {
+        setProfileNotFound(false);
         const email = session?.user?.email?.toLowerCase();
+        if (!email) {
+          throw new Error("Signed-in email is unavailable.");
+        }
+
         const { data, error } = await supabase
-          .from("users")
+          .from("donors")
           .select("*")
           .eq("email", email)
-          .single();
+          .maybeSingle();
 
         if (error) throw error;
 
-        if (data) {
-          setProfileData({
-            first_name: data.first_name || "",
-            last_name: data.last_name || "",
-            date_of_birth: data.date_of_birth || "",
-            blood_type: data.blood_type || "",
-            contact_number: data.contact_number || "",
-            address: data.address || "",
-            city: data.city || "",
-            province: data.province || "",
-            zip_code: data.zip_code || "",
-          });
+        if (!data) {
+          setProfileNotFound(true);
+          return;
         }
-      } catch (error: any) {
+
+        setProfileData({
+          first_name: data.first_name || "",
+          last_name: data.last_name || "",
+          date_of_birth: data.date_of_birth || "",
+          blood_type: data.blood_type || "",
+          contact_number: data.contact_number || "",
+          address: data.address || "",
+          city: data.city || "",
+          province: data.province || "",
+          zip_code: data.zip_code || "",
+        });
+      } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : String(error);
         toast({
           title: "Error",
-          description: error.message,
+          description: message,
           variant: "destructive",
         });
       } finally {
@@ -91,8 +101,12 @@ const Profile = () => {
 
     try {
       const email = session?.user?.email?.toLowerCase();
+      if (!email) {
+        throw new Error("Signed-in email is unavailable.");
+      }
+
       const { error } = await supabase
-        .from("users")
+        .from("donors")
         .update({
           first_name: profileData.first_name,
           last_name: profileData.last_name,
@@ -116,12 +130,11 @@ const Profile = () => {
         title: "Success",
         description: "Profile updated successfully",
       });
-      console.log(error);
-      console.log(profileData);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : String(error);
       toast({
         title: "Error",
-        description: error.message,
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -133,6 +146,30 @@ const Profile = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (profileNotFound) {
+    return (
+      <div className="container mx-auto max-w-3xl mb-16 mt-8">
+        <Button
+          variant="ghost"
+          onClick={() => navigate(-1)}
+          className="mb-6"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Donor profile not found</CardTitle>
+            <CardDescription>
+              No donor profile record was found for this signed-in email. Please contact an administrator.
+            </CardDescription>
+          </CardHeader>
+        </Card>
       </div>
     );
   }

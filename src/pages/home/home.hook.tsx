@@ -32,7 +32,7 @@ const useHome = () => {
     queryKey: ["active-donors-count"],
     queryFn: async () => {
       const { count, error } = await supabase
-        .from("users")
+        .from("donors")
         .select("*", { count: "exact", head: true })
         .eq("eligibility_status", "Eligible");
 

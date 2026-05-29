@@ -1,0 +1,92 @@
+Regenerated Supabase types evidence
+
+PostgREST version
+9: export type Database = {
+10:   // Allows to automatically instantiate createClient with right options
+11:   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
+12:   __InternalSupabase: {
+13:     PostgrestVersion: "14.5"
+14:   }
+
+Donations relationship metadata
+252:             columns: ["center_id"]
+253:             isOneToOne: false
+254:             referencedRelation: "prc_centers"
+255:             referencedColumns: ["center_id"]
+256:           },
+257:           {
+258:             foreignKeyName: "donations_donor_id_fkey"
+259:             columns: ["donor_id"]
+260:             isOneToOne: false
+261:             referencedRelation: "donors"
+262:             referencedColumns: ["donor_id"]
+263:           },
+264:           {
+265:             foreignKeyName: "donations_drive_id_fkey"
+266:             columns: ["drive_id"]
+267:             isOneToOne: false
+268:             referencedRelation: "donation_drives"
+269:             referencedColumns: ["drive_id"]
+270:           },
+271:         ]
+272:       }
+
+Donors table and isAdmin field
+333:           auth_user_id: string | null
+334:           blood_type: string
+335:           city: string | null
+336:           contact_number: string
+337:           created_at: string | null
+338:           date_of_birth: string
+339:           donor_id: number
+340:           eligibility_status:
+341:             | Database["public"]["Enums"]["eligibility_status_enum"]
+342:             | null
+343:           email: string | null
+344:           first_name: string
+345:           isAdmin: boolean
+346:           last_donation_date: string | null
+347:           last_name: string
+348:           province: string | null
+349:           updated_at: string | null
+350:           zip_code: string | null
+351:         }
+352:         Insert: {
+353:           address?: string | null
+354:           auth_user_id?: string | null
+355:           blood_type: string
+356:           city?: string | null
+357:           contact_number: string
+358:           created_at?: string | null
+359:           date_of_birth: string
+360:           donor_id?: number
+361:           eligibility_status?:
+362:             | Database["public"]["Enums"]["eligibility_status_enum"]
+363:             | null
+364:           email?: string | null
+365:           first_name: string
+366:           isAdmin?: boolean
+367:           last_donation_date?: string | null
+368:           last_name: string
+369:           province?: string | null
+370:           updated_at?: string | null
+371:           zip_code?: string | null
+372:         }
+373:         Update: {
+374:           address?: string | null
+375:           auth_user_id?: string | null
+376:           blood_type?: string
+377:           city?: string | null
+378:           contact_number?: string
+379:           created_at?: string | null
+380:           date_of_birth?: string
+381:           donor_id?: number
+382:           eligibility_status?:
+383:             | Database["public"]["Enums"]["eligibility_status_enum"]
+384:             | null
+385:           email?: string | null
+386:           first_name?: string
+387:           isAdmin?: boolean
+388:           last_donation_date?: string | null
+389:           last_name?: string
+390:           province?: string | null
