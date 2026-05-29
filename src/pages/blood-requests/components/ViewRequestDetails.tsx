@@ -130,7 +130,7 @@ const ViewRequestDetails = ({
         <DialogHeader>
           <div className="flex items-start justify-between">
             <div>
-              <DialogTitle className="text-2xl">Request Details</DialogTitle>
+              <DialogTitle className="text-2xl text-left">Request Details</DialogTitle>
               <DialogDescription>
                 Complete information about this blood request
               </DialogDescription>

@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import {
   Card,
   CardContent,
@@ -21,8 +22,11 @@ import {
   Clock,
   Search,
   CalendarPlus,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 interface DashboardProps {
   activeDonorsCount: number;
@@ -33,7 +37,6 @@ interface DashboardProps {
     units: number;
     status: "good" | "medium" | "low" | "critical";
   }[];
-  donationDrives: any;
   fulfillmentRate: number;
   session: any;
   userProfile: any;
@@ -44,414 +47,572 @@ const Dashboard = ({
   totalUnits,
   emergencyRequests,
   inventoryStatus,
-  donationDrives,
   fulfillmentRate,
   session,
   userProfile,
 }: DashboardProps) => {
+  const DRIVES_PER_PAGE = 6;
+  const [drivePage, setDrivePage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("Ongoing");
+  const driveTabsListRef = useRef<HTMLDivElement | null>(null);
 
-  // Filter donation drives based on search query and status
-  const filteredDrives = donationDrives?.filter((drive: any) => {
-    const query = searchQuery.toLowerCase();
-    const matchesSearch = 
-      drive.drive_name?.toLowerCase().includes(query) ||
-      drive.venue_address?.toLowerCase().includes(query) ||
-      drive.city?.toLowerCase().includes(query) ||
-      drive.province?.toLowerCase().includes(query);
+  useEffect(() => {
+    if (drivePage !== 1) {
+      setDrivePage(1);
+    }
+  }, [searchQuery, statusFilter]);
 
-    // If searching, return all matching drives regardless of status filter
-    if (searchQuery.trim()) {
-      return matchesSearch;
+  useEffect(() => {
+    const list = driveTabsListRef.current;
+    if (!list) return;
+
+    const activeTab = list.querySelector<HTMLElement>("[data-state='active']");
+    if (activeTab) {
+      activeTab.scrollIntoView({
+        behavior: "smooth",
+        inline: "nearest",
+        block: "nearest",
+      });
+      return;
     }
 
-    // Otherwise, apply status filter
-    // Determine drive status
-    const startDate = new Date(drive.start_datetime);
-    const endDate = new Date(drive.end_datetime);
-    const now = new Date();
-    
-    const isUpcoming = startDate > now;
-    const isOngoing = startDate <= now && endDate >= now;
-    const isPast = endDate < now;
-    
-    let driveStatus = "";
-    if (drive.status === "Completed") driveStatus = "Completed";
-    else if (drive.status === "Cancelled") driveStatus = "Cancelled";
-    else if (isOngoing) driveStatus = "Ongoing";
-    else if (isUpcoming) driveStatus = "Upcoming";
-    else if (isPast) driveStatus = "Past";
+    list.scrollTo({ left: 0, behavior: "smooth" });
+  }, [statusFilter]);
 
-    const matchesStatus = statusFilter === "All" || driveStatus === statusFilter;
+  const { data: drivesData } = useQuery({
+    queryKey: [
+      "dashboard-donation-drives",
+      drivePage,
+      searchQuery,
+      statusFilter,
+    ],
+    queryFn: async () => {
+      const from = (drivePage - 1) * DRIVES_PER_PAGE;
+      const to = from + DRIVES_PER_PAGE - 1;
+      const nowIso = new Date().toISOString();
+      const normalizedSearch = searchQuery.trim();
 
-    return matchesStatus;
-  }) || [];
+      const applyFilters = (query: any) => {
+        let next = query;
+
+        if (normalizedSearch) {
+          next = next.or(
+            `drive_name.ilike.%${normalizedSearch}%,venue_address.ilike.%${normalizedSearch}%,city.ilike.%${normalizedSearch}%,province.ilike.%${normalizedSearch}%`,
+          );
+          return next;
+        }
+
+        if (statusFilter === "Completed") {
+          return next.eq("status", "Completed");
+        }
+
+        if (statusFilter === "Ongoing") {
+          return next
+            .not("status", "eq", "Completed")
+            .not("status", "eq", "Cancelled")
+            .lte("start_datetime", nowIso)
+            .gte("end_datetime", nowIso);
+        }
+
+        if (statusFilter === "Upcoming") {
+          return next
+            .not("status", "eq", "Completed")
+            .not("status", "eq", "Cancelled")
+            .gt("start_datetime", nowIso);
+        }
+
+        if (statusFilter === "Past") {
+          return next
+            .not("status", "eq", "Completed")
+            .not("status", "eq", "Cancelled")
+            .lt("end_datetime", nowIso);
+        }
+
+        return next;
+      };
+
+      const dataBaseQuery = applyFilters(
+        supabase
+          .from("donation_drives")
+          .select("*")
+          .order("start_datetime", { ascending: false }),
+      );
+
+      const { data, error } = await dataBaseQuery.range(from, to);
+
+      if (error) throw error;
+
+      const countBaseQuery = applyFilters(
+        supabase
+          .from("donation_drives")
+          .select("*", { count: "exact", head: true }),
+      );
+
+      const { count, error: countError } = await countBaseQuery;
+
+      if (countError) throw countError;
+
+      return {
+        drives: data || [],
+        totalCount: count || 0,
+      };
+    },
+  });
+
+  const filteredDrives = drivesData?.drives || [];
+  const totalDrivePages = Math.max(
+    1,
+    Math.ceil((drivesData?.totalCount || 0) / DRIVES_PER_PAGE),
+  );
 
   return (
-  <div className="min-h-screen bg-background">
-    <div className="container mx-auto px-4 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <p className="text-muted-foreground text-center">
-          Overview of blood bank operations across PRC network
-        </p>
-      </div>
+    <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <p className="text-muted-foreground text-center">
+            Overview of blood bank operations across PRC network
+          </p>
+        </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">
-                  Active Donors
-                </div>
-                <div className="text-3xl font-bold text-foreground">
-                  {activeDonorsCount.toLocaleString()}
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Eligible to donate
-                </div>
-              </div>
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Users className="h-8 w-8 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">
-                  Units in Stock
-                </div>
-                <div className="text-3xl font-bold text-foreground">
-                  {totalUnits.toLocaleString()}
-                </div>
-                <div className="text-xs text-warning flex items-center gap-1 mt-1">
-                  <AlertCircle className="h-3 w-3" />3 types below threshold
-                </div>
-              </div>
-              <div className="p-3 bg-success/10 rounded-lg">
-                <Package className="h-8 w-8 text-success" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">
-                  Emergency Requests
-                </div>
-                <div className="text-3xl font-bold text-foreground">
-                  {emergencyRequests.length}
-                </div>
-                <div className="text-xs text-emergency flex items-center gap-1 mt-1">
-                  <Clock className="h-3 w-3" />
-                  Need blood urgently
-                </div>
-              </div>
-              <div className="p-3 bg-emergency/10 rounded-lg">
-                <AlertCircle className="h-8 w-8 text-emergency" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="pt-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-sm text-muted-foreground mb-1">
-                  Fulfillment Rate
-                </div>
-                <div className="text-3xl font-bold text-foreground">
-                  {fulfillmentRate.toFixed(1)}%
-                </div>
-                <div className={`text-xs flex items-center gap-1 mt-1 ${
-                  fulfillmentRate >= 90 ? 'text-success' : 
-                  fulfillmentRate >= 70 ? 'text-warning' : 
-                  'text-emergency'
-                }`}>
-                  <TrendingUp className="h-3 w-3" />
-                  {fulfillmentRate >= 90 ? 'Above target' : 
-                   fulfillmentRate >= 70 ? 'Near target' : 
-                   'Below target'}
-                </div>
-              </div>
-              <div className="p-3 bg-accent/10 rounded-lg">
-                <TrendingUp className="h-8 w-8 text-accent" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Schedule My Donation CTA - Only show for non-admin logged-in users */}
-      {session && !userProfile?.is_admin && (
-        <Card className="mb-8 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
-          <CardContent className="py-8">
-            <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-              <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
-                <div className="p-4 bg-primary rounded-full">
-                  <CalendarPlus className="h-8 w-8 text-primary-foreground" />
-                </div>
+        {/* Key Metrics */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground mb-2">
-                    Ready to Save Lives?
-                  </h3>
-                  <p className="text-muted-foreground">
-                    Browse donation drives below and click on one to schedule your appointment
-                  </p>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Active Donors
+                  </div>
+                  <div className="text-3xl font-bold text-foreground">
+                    {activeDonorsCount.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1">
+                    Eligible to donate
+                  </div>
+                </div>
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Users className="h-8 w-8 text-primary" />
                 </div>
               </div>
-              <Button 
-                size="lg" 
-                className="whitespace-nowrap"
-                onClick={() => {
-                  document.getElementById('donation-drives-section')?.scrollIntoView({ behavior: 'smooth' });
-                }}
-              >
-                <CalendarPlus className="h-5 w-5 mr-2" />
-                View Donation Drives
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            </CardContent>
+          </Card>
 
-      <Card id="donation-drives-section">
-        <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
-            <div>
-              <CardTitle>Donation Drives</CardTitle>
-              <CardDescription>
-                Scheduled blood donation events across the network
-              </CardDescription>
-            </div>
-            {session && userProfile?.is_admin && (
-              <Button variant="outline" size="sm" asChild>
-                <Link to="/schedule-drive">Schedule New Drive</Link>
-              </Button>
-            )}
-          </div>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search drives by name, location, city, or province..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
-          <Tabs value={statusFilter} onValueChange={setStatusFilter} className="mt-4">
-            <TabsList className="flex w-full gap-2 overflow-x-auto">
-              <TabsTrigger value="Ongoing">Ongoing</TabsTrigger>
-              <TabsTrigger value="Upcoming">Upcoming</TabsTrigger>
-              <TabsTrigger value="Past">Past</TabsTrigger>
-              <TabsTrigger value="Completed">Completed</TabsTrigger>
-              <TabsTrigger value="All">All</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </CardHeader>
-        <CardContent>
-          {filteredDrives.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              {filteredDrives.map((drive: any) => {
-              const startDate = new Date(drive.start_datetime);
-              const endDate = new Date(drive.end_datetime);
-              const now = new Date();
-              
-              const isUpcoming = startDate > now;
-              const isOngoing = startDate <= now && endDate >= now;
-              const isPast = endDate < now;
-              
-              const getStatusBadge = () => {
-                if (drive.status === "Completed") return <Badge variant="default">Completed</Badge>;
-                if (drive.status === "Cancelled") return <Badge variant="destructive">Cancelled</Badge>;
-                if (isOngoing) return <Badge variant="success">Ongoing</Badge>;
-                if (isUpcoming) return <Badge variant="outline">Upcoming</Badge>;
-                if (isPast) return <Badge variant="secondary">Past</Badge>;
-                return <Badge variant="outline">{drive.status}</Badge>;
-              };
-
-              return (
-                <Link
-                  key={drive.drive_id}
-                  to={`/drive/${drive.drive_id}`}
-                  className="block"
-                >
-                  <div className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer hover:border-primary">
-                    <div className="flex items-start gap-3">
-                      <div className="p-2 bg-primary/10 rounded">
-                        <Calendar className="h-5 w-5 text-primary" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between gap-2 mb-1">
-                          <div className="font-semibold text-foreground">
-                            {drive.drive_name}
-                          </div>
-                          {getStatusBadge()}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
-                          <MapPin className="h-3 w-3" />
-                          {drive.venue_address}
-                        </div>
-                        <Badge variant="outline">
-                          {new Date(drive.start_datetime).toLocaleDateString()}
-                        </Badge>
-                      </div>
-                    </div>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Units in Stock
                   </div>
-                </Link>
-              );
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-1">
-                {searchQuery ? "No drives found" : "No donation drives scheduled"}
-              </p>
-              <p className="text-sm">
-                {searchQuery
-                  ? "Try adjusting your search terms"
-                  : "Check back later for upcoming donation drives"}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
-        {/* Emergency Requests */}
-        <Card>
-          <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div>
-                <CardTitle>All Emergency Requests</CardTitle>
-                <CardDescription>
-                  Urgent blood requests requiring immediate attention
-                </CardDescription>
+                  <div className="text-3xl font-bold text-foreground">
+                    {totalUnits.toLocaleString()}
+                  </div>
+                  <div className="text-xs text-warning flex items-center gap-1 mt-1">
+                    <AlertCircle className="h-3 w-3" />3 types below threshold
+                  </div>
+                </div>
+                <div className="p-3 bg-success/10 rounded-lg">
+                  <Package className="h-8 w-8 text-success" />
+                </div>
               </div>
-              {session && (
-                <Button variant="emergency" size="sm">
-                  <Link to="/requests">View All</Link>
-                </Button>
-              )}
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {emergencyRequests.length > 0 ? (
-                emergencyRequests.slice(0, 3).map((request: any) => (
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Emergency Requests
+                  </div>
+                  <div className="text-3xl font-bold text-foreground">
+                    {emergencyRequests.length}
+                  </div>
+                  <div className="text-xs text-emergency flex items-center gap-1 mt-1">
+                    <Clock className="h-3 w-3" />
+                    Need blood urgently
+                  </div>
+                </div>
+                <div className="p-3 bg-emergency/10 rounded-lg">
+                  <AlertCircle className="h-8 w-8 text-emergency" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-sm text-muted-foreground mb-1">
+                    Fulfillment Rate
+                  </div>
+                  <div className="text-3xl font-bold text-foreground">
+                    {fulfillmentRate.toFixed(1)}%
+                  </div>
                   <div
-                    key={request.id}
-                    className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors"
+                    className={`text-xs flex items-center gap-1 mt-1 ${
+                      fulfillmentRate >= 90
+                        ? "text-success"
+                        : fulfillmentRate >= 70
+                          ? "text-warning"
+                          : "text-emergency"
+                    }`}
                   >
-                    <div className="flex items-center gap-4">
-                      <div className="p-2 bg-emergency/10 rounded">
-                        <Droplets className="h-5 w-5 text-emergency" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">
-                          {request.hospital}
-                        </div>
-                        <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2">
-                          {request.items
-                            .slice(0, 2)
-                            .map((item: any, idx: number) => (
-                              <Badge key={idx} variant="emergency">
-                                {item.bloodType}
-                              </Badge>
-                            ))}
-                          <span>
-                            {request.items.reduce(
-                              (sum: number, item: any) =>
-                                sum + (item.requested - (item.fulfilled || 0)),
-                              0
-                            )}{" "}
-                            units needed
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-xs text-muted-foreground flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {request.requestDate}
-                    </div>
+                    <TrendingUp className="h-3 w-3" />
+                    {fulfillmentRate >= 90
+                      ? "Above target"
+                      : fulfillmentRate >= 70
+                        ? "Near target"
+                        : "Below target"}
                   </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-muted-foreground">
-                  <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                  <p>No emergency requests at this time</p>
                 </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
+                <div className="p-3 bg-accent/10 rounded-lg">
+                  <TrendingUp className="h-8 w-8 text-accent" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
 
-        {/* Inventory Status */}
-        <Card>
+        {/* Schedule My Donation CTA - Only show for non-admin logged-in users */}
+        {session && !userProfile?.is_admin && (
+          <Card className="mb-8 border-primary bg-gradient-to-r from-primary/5 to-primary/10">
+            <CardContent className="py-8">
+              <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div className="flex flex-col sm:flex-row items-center gap-4 text-center sm:text-left">
+                  <div className="p-4 bg-primary rounded-full">
+                    <CalendarPlus className="h-8 w-8 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold text-foreground mb-2">
+                      Ready to Save Lives?
+                    </h3>
+                    <p className="text-muted-foreground">
+                      Browse donation drives below and click on one to schedule
+                      your appointment
+                    </p>
+                  </div>
+                </div>
+                <Button
+                  size="lg"
+                  className="whitespace-nowrap"
+                  onClick={() => {
+                    document
+                      .getElementById("donation-drives-section")
+                      ?.scrollIntoView({ behavior: "smooth" });
+                  }}
+                >
+                  <CalendarPlus className="h-5 w-5 mr-2" />
+                  View Donation Drives
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card id="donation-drives-section">
           <CardHeader>
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-4">
               <div>
-                <CardTitle>Current Blood Inventory</CardTitle>
+                <CardTitle>Donation Drives</CardTitle>
                 <CardDescription>
-                  Current stock levels by blood type
+                  Scheduled blood donation events across the network
                 </CardDescription>
               </div>
               {session && userProfile?.is_admin && (
                 <Button variant="outline" size="sm" asChild>
-                  <Link to="/inventory">Manage</Link>
+                  <Link to="/schedule-drive">Schedule New Drive</Link>
                 </Button>
               )}
             </div>
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                type="text"
+                placeholder="Search by drive name or location"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-9 text-sm"
+              />
+            </div>
+            <Tabs
+              value={statusFilter}
+              onValueChange={setStatusFilter}
+              className="mt-4"
+            >
+              <TabsList
+                ref={driveTabsListRef}
+                className="mb-4 sm:mb-6 flex w-full h-auto gap-1 overflow-x-auto overflow-y-hidden p-1"
+              >
+                <TabsTrigger
+                  value="Ongoing"
+                  className="ml-10 shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
+                >
+                  Ongoing
+                </TabsTrigger>
+                <TabsTrigger
+                  value="Upcoming"
+                  className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
+                >
+                  Upcoming
+                </TabsTrigger>
+                <TabsTrigger
+                  value="Past"
+                  className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
+                >
+                  Past
+                </TabsTrigger>
+                <TabsTrigger
+                  value="Completed"
+                  className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
+                >
+                  Completed
+                </TabsTrigger>
+                <TabsTrigger
+                  value="All"
+                  className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
+                >
+                  All
+                </TabsTrigger>
+              </TabsList>
+            </Tabs>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {inventoryStatus.map((item) => (
-                <div key={item.bloodType} className="p-4 border rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-lg font-bold text-foreground">
-                      {item.bloodType}
-                    </span>
-                    <Badge
-                      variant={
-                        item.status === "good"
-                          ? "success"
-                          : item.status === "critical"
-                          ? "emergency"
-                          : "warning"
-                      }
+            {filteredDrives.length > 0 ? (
+              <>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                  {filteredDrives.map((drive: any) => {
+                    const startDate = new Date(drive.start_datetime);
+                    const endDate = new Date(drive.end_datetime);
+                    const now = new Date();
+
+                    const isUpcoming = startDate > now;
+                    const isOngoing = startDate <= now && endDate >= now;
+                    const isPast = endDate < now;
+
+                    const getStatusBadge = () => {
+                      if (drive.status === "Completed")
+                        return <Badge variant="default">Completed</Badge>;
+                      if (drive.status === "Cancelled")
+                        return <Badge variant="destructive">Cancelled</Badge>;
+                      if (isOngoing)
+                        return <Badge variant="success">Ongoing</Badge>;
+                      if (isUpcoming)
+                        return <Badge variant="outline">Upcoming</Badge>;
+                      if (isPast)
+                        return <Badge variant="secondary">Past</Badge>;
+                      return <Badge variant="outline">{drive.status}</Badge>;
+                    };
+
+                    return (
+                      <Link
+                        key={drive.drive_id}
+                        to={`/drive/${drive.drive_id}`}
+                        className="block"
+                      >
+                        <div className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer hover:border-primary">
+                          <div className="flex items-start gap-3">
+                            <div className="p-2 bg-primary/10 rounded">
+                              <Calendar className="h-5 w-5 text-primary" />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between gap-2 mb-1">
+                                <div className="font-semibold text-foreground">
+                                  {drive.drive_name}
+                                </div>
+                                {getStatusBadge()}
+                              </div>
+                              <div className="text-sm text-muted-foreground flex items-center gap-1 mb-2">
+                                <MapPin className="h-3 w-3" />
+                                {drive.venue_address}
+                              </div>
+                              <Badge variant="outline">
+                                {new Date(
+                                  drive.start_datetime,
+                                ).toLocaleDateString()}
+                              </Badge>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+
+                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
+                    Page {drivePage} of {totalDrivePages}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 sm:flex sm:items-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setDrivePage(Math.max(1, drivePage - 1))}
+                      disabled={drivePage <= 1}
+                      className="w-full sm:w-auto"
                     >
-                      {item.status}
-                    </Badge>
-                  </div>
-                  <div className="text-2xl font-bold text-foreground">
-                    {item.units}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    units available
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Prev
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() =>
+                        setDrivePage(Math.min(totalDrivePages, drivePage + 1))
+                      }
+                      disabled={drivePage >= totalDrivePages}
+                      className="w-full sm:w-auto"
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
                   </div>
                 </div>
-              ))}
-            </div>
+              </>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Calendar className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium mb-1">
+                  {searchQuery
+                    ? "No drives found"
+                    : "No donation drives scheduled"}
+                </p>
+                <p className="text-sm">
+                  {searchQuery
+                    ? "Try adjusting your search terms"
+                    : "Check back later for upcoming donation drives"}
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
-      </div>
 
-      {/* Upcoming Donation Drives */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
+          {/* Emergency Requests */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <CardTitle>All Emergency Requests</CardTitle>
+                  <CardDescription>
+                    Urgent blood requests requiring immediate attention
+                  </CardDescription>
+                </div>
+                {session && (
+                  <Button variant="emergency" size="sm">
+                    <Link to="/requests">View All</Link>
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {emergencyRequests.length > 0 ? (
+                  emergencyRequests.slice(0, 3).map((request: any) => (
+                    <div
+                      key={request.id}
+                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-secondary/50 transition-colors"
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="p-2 bg-emergency/10 rounded">
+                          <Droplets className="h-5 w-5 text-emergency" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">
+                            {request.hospital}
+                          </div>
+                          <div className="text-sm text-muted-foreground flex flex-wrap items-center gap-2">
+                            {request.items
+                              .slice(0, 2)
+                              .map((item: any, idx: number) => (
+                                <Badge key={idx} variant="emergency">
+                                  {item.bloodType}
+                                </Badge>
+                              ))}
+                            <span>
+                              {request.items.reduce(
+                                (sum: number, item: any) =>
+                                  sum +
+                                  (item.requested - (item.fulfilled || 0)),
+                                0,
+                              )}{" "}
+                              units needed
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <Clock className="h-3 w-3" />
+                        {request.requestDate}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <AlertCircle className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                    <p>No emergency requests at this time</p>
+                  </div>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Inventory Status */}
+          <Card>
+            <CardHeader>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <CardTitle>Current Blood Inventory</CardTitle>
+                  <CardDescription>
+                    Current stock levels by blood type
+                  </CardDescription>
+                </div>
+                {session && userProfile?.is_admin && (
+                  <Button variant="outline" size="sm" asChild>
+                    <Link to="/inventory">Manage</Link>
+                  </Button>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {inventoryStatus.map((item) => (
+                  <div key={item.bloodType} className="p-4 border rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-lg font-bold text-foreground">
+                        {item.bloodType}
+                      </span>
+                      <Badge
+                        variant={
+                          item.status === "good"
+                            ? "success"
+                            : item.status === "critical"
+                              ? "emergency"
+                              : "warning"
+                        }
+                      >
+                        {item.status}
+                      </Badge>
+                    </div>
+                    <div className="text-2xl font-bold text-foreground">
+                      {item.units}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      units available
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Upcoming Donation Drives */}
+      </div>
     </div>
-  </div>
   );
 };
 

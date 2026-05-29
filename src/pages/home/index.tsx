@@ -25,7 +25,6 @@ const Home = () => {
     totalUnits,
     emergencyRequests,
     inventoryStatus,
-    donationDrives,
     fulfillmentRate,
     isLoading,
   } = useHome();
@@ -137,7 +136,6 @@ const Home = () => {
         totalUnits={totalUnits}
         emergencyRequests={emergencyRequests}
         inventoryStatus={inventoryStatus}
-        donationDrives={donationDrives}
         fulfillmentRate={fulfillmentRate}
         session={session}
         userProfile={userProfile}

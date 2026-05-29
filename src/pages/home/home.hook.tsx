@@ -76,20 +76,7 @@ const useHome = () => {
     },
   });
 
-  const { data: donationDrives, isLoading: isLoadingDrives } = useQuery({
-    queryKey: ["donation_drives"],
-    queryFn: async () => {
-      const { data, error } = await supabase
-        .from("donation_drives")
-        .select("*")
-        .order("start_datetime", { ascending: false })
-
-      if (error) throw error;
-      return data;
-    },
-  });
-
-  const isLoading = isLoadingDonors || isLoadingInventory || isLoadingDrives;
+  const isLoading = isLoadingDonors || isLoadingInventory;
 
   return {
     totalUnits,
@@ -97,7 +84,6 @@ const useHome = () => {
     urgentRequests,
     activeDonorsCount,
     inventoryStatus,
-    donationDrives,
     fulfillmentRate,
     isLoading,
   };

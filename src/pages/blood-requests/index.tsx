@@ -403,34 +403,34 @@ const Requests = () => {
 
         <div className="col-span-1 lg:col-span-2">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-5 mb-4 sm:mb-6 h-auto overflow-x-auto">
+            <TabsList className="mb-4 sm:mb-6 flex w-full h-auto gap-1 overflow-x-auto overflow-y-hidden p-1">
               {session && userProfile?.is_admin ? (
-                <TabsTrigger value="myRequests" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">
+                <TabsTrigger value="myRequests" className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
                   My Requests ({myPendingRequests.length})
                 </TabsTrigger>
               ) : (
-                <TabsTrigger value="all" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">
+                <TabsTrigger value="all" className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
                   All ({pendingRequests.length})
                 </TabsTrigger>
               )}
               <TabsTrigger
                 value="emergency"
-                className="data-[state=active]:text-emergency text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                className="shrink-0 data-[state=active]:text-emergency text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
               >
                 Emergency ({emergencyRequests.length})
               </TabsTrigger>
               <TabsTrigger
                 value="urgent"
-                className="data-[state=active]:text-warning text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                className="shrink-0 data-[state=active]:text-warning text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
               >
                 Urgent ({urgentRequests.length})
               </TabsTrigger>
-              <TabsTrigger value="routine" className="text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4">
+              <TabsTrigger value="routine" className="shrink-0 text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4">
                 Routine ({routineRequests.length})
               </TabsTrigger>
               <TabsTrigger
                 value="fulfilled"
-                className="data-[state=active]:text-success text-xs sm:text-sm whitespace-nowrap px-2 sm:px-4"
+                className="shrink-0 data-[state=active]:text-success text-xs sm:text-sm whitespace-nowrap px-3 sm:px-4"
               >
                 Fulfilled ({fulfilledRequests.length})
               </TabsTrigger>
